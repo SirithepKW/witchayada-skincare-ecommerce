@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SkincareShop — Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- Markdown ใน HTML ผ่าน JavaScript ด้วย marked.js (CSI204 Workshop) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black:#0A0A0A; --white:#FFFFFF; --cream:#F7F5F2; --warm:#EDE9E3;
+      --gray:#888; --border:#E0DDD8; --serif:'Cormorant Garamond',Georgia,serif; --sans:'Inter',sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--white); color: var(--black); font-size: 14px; line-height: 1.6; }
+
+    /* NAV (shared) */
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.2rem 3rem; background:rgba(255,255,255,0.95); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); }
+    .nav-logo { font-family:var(--serif); font-size:1.4rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--black); text-decoration:none; }
+    .nav-links { display:flex; gap:2.5rem; list-style:none; }
+    .nav-links a { text-decoration:none; color:var(--gray); font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; transition:color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color:var(--black); }
+    .nav-icons { display:flex; gap:1.2rem; }
+    .nav-icons span { cursor:pointer; font-size:1rem; color:var(--gray); transition:color 0.2s; position:relative; }
+    .nav-icons span:hover { color:var(--black); }
+    .cart-count { position:absolute; top:-6px; right:-9px; background:var(--black); color:#fff; font-size:0.55rem; min-width:15px; height:15px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--sans); }
+
+    /* PAGE HEADER */
+    .doc-header { margin-top:60px; padding:4rem 5rem 2.5rem; background:var(--cream); border-bottom:1px solid var(--border); }
+    .doc-header .tag { font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gray); margin-bottom:1rem; }
+    .doc-header h1 { font-family:var(--serif); font-size:3rem; font-weight:300; line-height:1.1; }
+    .doc-header p { color:var(--gray); margin-top:0.75rem; font-size:0.9rem; max-width:560px; }
+
+    /* LAYOUT */
+    .doc-layout { display:grid; grid-template-columns:240px 1fr; gap:3.5rem; padding:3rem 5rem 5rem; align-items:start; }
+
+    /* TOC SIDEBAR */
+    .toc { position:sticky; top:90px; }
+    .toc h3 { font-size:0.68rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--gray); margin-bottom:1rem; }
+    .toc ul { list-style:none; border-left:1px solid var(--border); }
+    .toc ul li a { display:block; padding:0.4rem 0 0.4rem 1rem; margin-left:-1px; text-decoration:none; color:var(--gray); font-size:0.8rem; border-left:1px solid transparent; transition:all 0.2s; }
+    .toc ul li a:hover, .toc ul li a.active { color:var(--black); border-left-color:var(--black); }
+
+    /* RENDERED MARKDOWN */
+    .doc-badge { display:inline-block; font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; background:var(--black); color:#fff; padding:0.3rem 0.7rem; margin-bottom:1.5rem; }
+    #MDContent { max-width:760px; }
+    #MDContent h1 { font-family:var(--serif); font-size:2.2rem; font-weight:300; margin:2.5rem 0 1rem; padding-bottom:0.6rem; border-bottom:1px solid var(--border); }
+    #MDContent h2 { font-family:var(--serif); font-size:1.6rem; font-weight:300; margin:2.2rem 0 0.9rem; }
+    #MDContent h3 { font-family:var(--serif); font-size:1.2rem; font-weight:400; margin:1.6rem 0 0.7rem; }
+    #MDContent h1:first-child { margin-top:0; }
+    #MDContent p { margin-bottom:1rem; color:#333; }
+    #MDContent ul, #MDContent ol { margin:0 0 1rem 1.4rem; }
+    #MDContent li { margin-bottom:0.4rem; color:#333; }
+    #MDContent a { color:var(--black); text-decoration:underline; text-underline-offset:2px; }
+    #MDContent strong { font-weight:500; }
+    #MDContent code { font-family:'Courier New',monospace; font-size:0.82rem; background:var(--cream); padding:0.1rem 0.4rem; border-radius:3px; }
+    #MDContent pre { background:var(--black); color:#e6e6e6; padding:1.4rem; border-radius:4px; overflow-x:auto; margin-bottom:1.4rem; }
+    #MDContent pre code { background:none; color:inherit; padding:0; font-size:0.8rem; line-height:1.7; }
+    #MDContent table { border-collapse:collapse; width:100%; margin-bottom:1.5rem; font-size:0.85rem; }
+    #MDContent th, #MDContent td { border:1px solid var(--border); padding:0.6rem 0.85rem; text-align:left; }
+    #MDContent th { background:var(--cream); font-weight:500; letter-spacing:0.03em; }
+    #MDContent blockquote { border-left:2px solid var(--black); padding:0.3rem 0 0.3rem 1.2rem; margin:0 0 1.2rem; color:var(--gray); font-style:italic; }
+    #MDContent hr { border:none; border-top:1px solid var(--border); margin:2.5rem 0; }
+
+    /* FOOTER (shared) */
+    footer { background:var(--black); color:rgba(255,255,255,0.4); padding:3rem 5rem; display:grid; grid-template-columns:1fr auto; gap:2rem; align-items:start; }
+    .footer-logo { font-family:var(--serif); font-size:1.4rem; color:#fff; letter-spacing:0.12em; text-transform:uppercase; }
+    .footer-links { display:flex; gap:2rem; }
+    .footer-links a { color:rgba(255,255,255,0.55); text-decoration:none; font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; transition:color 0.2s; }
+    .footer-links a:hover { color:#fff; }
+    .footer-info { font-size:0.72rem; line-height:1.8; text-align:right; }
+
+    @media (max-width: 768px) {
+      nav { padding:1rem 1.5rem; }
+      .nav-links { display:none; }
+      .doc-header { padding:3rem 1.5rem 2rem; }
+      .doc-header h1 { font-size:2.2rem; }
+      .doc-layout { grid-template-columns:1fr; padding:2rem 1.5rem 3rem; gap:2rem; }
+      .toc { position:static; }
+      footer { grid-template-columns:1fr; }
+      .footer-info { text-align:left; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">SkincareShop</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="pages/products.html">Shop</a></li>
+    <li><a href="markdown.html" class="active">Docs</a></li>
+    <li><a href="index.html#architecture">System</a></li>
+    <li><a href="index.html#checklist">Workshop</a></li>
+  </ul>
+  <div class="nav-icons">
+    <span title="Search">🔍</span>
+    <span title="Account" onclick="location.href='pages/login.html'">👤</span>
+    <span title="Cart" onclick="location.href='pages/cart.html'">🛒<span class="cart-count">0</span></span>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<div class="doc-header">
+  <p class="tag">CSI204 · Workshop #1 · Documentation</p>
+  <h1>Project Documentation</h1>
+  <p>เอกสารข้อกำหนดระบบ (System Requirement Specification) ของ SkincareShop เรนเดอร์จาก Markdown ผ่าน JavaScript ด้วยไลบรารี <strong>marked.js</strong></p>
+</div>
+
+<!-- LAYOUT -->
+<div class="doc-layout">
+  <aside class="toc">
+    <h3>Contents</h3>
+    <ul id="tocList"></ul>
+  </aside>
+
+  <main>
+    <span class="doc-badge">Marked.js · Rendered in Browser</span>
+    <div id="MDContent"><!-- Markdown ถูกเรนเดอร์ตรงนี้ --></div>
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <p class="footer-logo">SkincareShop</p>
+    <p style="font-size:0.72rem; margin-top:0.6rem;">Premium Skincare Online Store</p>
+    <div class="footer-links" style="margin-top:1.2rem;">
+      <a href="index.html">Home</a>
+      <a href="pages/products.html">Shop</a>
+      <a href="markdown.html">Docs</a>
+      <a href="pages/login.html">Account</a>
+    </div>
+  </div>
+  <div class="footer-info">
+    CSI204 Digital Platform for Software Development<br/>
+    Workshop #1 · Project Documentation with GitHub<br/>
+    <span style="font-size:0.65rem; opacity:0.5;">w1_T001_67154712_วิชญาดา-กิตตินัฏพงศ์</span>
+  </div>
+</footer>
+
+<script>
+  // ── Markdown content (System Requirement Specification) ──
+  const markdownContent = `
+# SkincareShop — System Requirement Specification
+
+> เอกสารฉบับนี้ใช้ Markdown แล้วเรนเดอร์เป็น HTML ผ่าน **marked.js** ตามหัวข้อ "การใช้งาน MD Tag ภายใต้ไฟล์ .html ผ่าน JavaScript" ในรายวิชา CSI204
+
+| รายการ | ข้อมูล |
+|---|---|
+| โครงการ | SkincareShop — ร้านสกินแคร์ออนไลน์ |
+| รหัสวิชา | CSI204 Digital Platform for Software Development |
+| Repository | [github.com/bedyner/SkincareShop](https://github.com/bedyner/SkincareShop) |
+| GitHub Pages | [bedyner.github.io/SkincareShop](https://bedyner.github.io/SkincareShop/) |
+
+---
+
+# 1. ภาพรวมระบบ
+
+SkincareShop เป็นเว็บไซต์ **E-Commerce** สำหรับจำหน่ายผลิตภัณฑ์ดูแลผิวออนไลน์ ครอบคลุมตั้งแต่ Cleanser, Serum, Moisturizer ไปจนถึง Sunscreen ออกแบบตามแนวคิด *Separation of Concerns* แบ่งระบบเป็น Frontend / Backend / Database อย่างชัดเจน
+
+# 2. ความต้องการด้านฟังก์ชัน (Functional Requirements)
+
+## 2.1 ระบบหน้าร้าน (Customer Frontend)
+
+| รหัส | ฟังก์ชัน | รายละเอียด | ความสำคัญ |
+|---|---|---|---|
+| C-01 | แสดงรายการสินค้า | แสดงสินค้าพร้อมรูป ราคา หมวดหมู่ | High |
+| C-02 | ค้นหา / กรองสินค้า | กรองตามประเภทและช่วงราคา | High |
+| C-03 | ตะกร้าสินค้า | เพิ่ม / ลบ / ปรับจำนวนสินค้า | High |
+| C-04 | สมัครสมาชิก / Login | ลงทะเบียนและเข้าสู่ระบบ | Medium |
+| C-05 | ชำระเงิน | PromptPay, บัตรเครดิต, โอนผ่านธนาคาร | High |
+
+## 2.2 ระบบหลังบ้าน (Admin Dashboard)
+
+| รหัส | ฟังก์ชัน | รายละเอียด | ความสำคัญ |
+|---|---|---|---|
+| A-01 | จัดการสินค้า | CRUD เพิ่ม / แก้ไข / ลบสินค้า | High |
+| A-02 | จัดการคำสั่งซื้อ | ดูและอัปเดตสถานะคำสั่งซื้อ | High |
+| A-03 | รายงานยอดขาย | สรุปยอดขายรายวัน / รายเดือน | Medium |
+
+# 3. ความต้องการที่ไม่ใช่ฟังก์ชัน (Non-Functional)
+
+- **Security** — เข้ารหัสรหัสผ่าน, JWT Authentication, OAuth2
+- **Scalability** — รองรับผู้ใช้เพิ่มขึ้นด้วย Load Balancer + Caching
+- **Performance** — ใช้ Redis Cache ลด Query ซ้ำจาก Database
+- **Maintainability** — โครงสร้างโค้ดอ่านง่าย แยกเป็นโมดูล
+
+# 4. System Architecture
+
+\`\`\`
+Client Layer    →  Web / Mobile Browser (HTML · CSS · JS)
+Gateway Layer   →  GitHub Pages · API Gateway (Auth · Routing)
+Backend Layer   →  User · Product · Order · Payment Service
+Data Layer      →  MySQL (Primary) · Redis (Cache · Session)
+External        →  PromptPay · LINE Notify · Email (SMTP)
+\`\`\`
+
+> ดูแผนผัง Mermaid Diagram ฉบับเต็มได้ใน [README บน GitHub](https://github.com/bedyner/SkincareShop) และหน้า [System Architecture](index.html#architecture)
+
+# 5. เทคโนโลยีที่ใช้
+
+| Layer | เทคโนโลยี |
+|---|---|
+| Frontend | HTML5, CSS3, JavaScript (Vanilla) |
+| Backend | Node.js + Express.js |
+| Database | MySQL + Redis |
+| Version Control | Git + GitHub + Sourcetree |
+| Deployment | GitHub Pages |
+
+# 6. โครงสร้างหน้าเว็บ (Site Map)
+
+- **Home** ([index.html](index.html)) — หน้าแรก Hero + สินค้า + Architecture
+- **Shop** ([products.html](pages/products.html)) — รายการสินค้าทั้งหมด
+- **Cart** ([cart.html](pages/cart.html)) — ตะกร้าสินค้า
+- **Checkout** ([checkout.html](pages/checkout.html)) — ชำระเงิน
+- **Login** ([login.html](pages/login.html)) — เข้าสู่ระบบ / สมัครสมาชิก
+- **Docs** (markdown.html) — เอกสารฉบับนี้
+
+---
+
+*CSI204 — Digital Platform for Software Development | SPU*
+`;
+
+  // ── Render markdown → HTML ──
+  document.getElementById('MDContent').innerHTML = marked.parse(markdownContent);
+
+  // ── Auto-build Table of Contents from rendered h1 ──
+  const tocList = document.getElementById('tocList');
+  document.querySelectorAll('#MDContent h1').forEach((h, i) => {
+    const id = 'sec-' + i;
+    h.id = id;
+    const li = document.createElement('li');
+    li.innerHTML = '<a href="#' + id + '">' + h.textContent + '</a>';
+    tocList.appendChild(li);
+  });
+
+  // ── Cart badge from session ──
+  try {
+    const saved = JSON.parse(sessionStorage.getItem('skincareShopCart') || '[]');
+    const count = saved.reduce((s, i) => s + (i.qty || 0), 0);
+    document.querySelector('.cart-count').textContent = count;
+  } catch(e) {}
+</script>
+</body>
+</html>
