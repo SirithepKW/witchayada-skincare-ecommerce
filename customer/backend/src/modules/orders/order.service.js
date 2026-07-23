@@ -169,4 +169,31 @@ const getOrderById = async (customerId, orderId) => {
   }
 };
 
-module.exports = { createOrder, getMyOrders, getOrderById, ORDER_STATUSES };
+/**
+ * ลูกค้ากดยืนยันรับสินค้า → เปลี่ยนสถานะเป็น delivered
+ * (อนุญาตเมื่อสถานะเป็น confirmed หรือ shipping เท่านั้น)
+ */
+const confirmReceive = (customerId, orderId) => {
+  const order = findOne('orders', (o) => o.orderId === orderId && o.customerId === customerId);
+  if (!order) {
+    const err = new Error('ไม่พบคำสั่งซื้อ');
+    err.statusCode = 404;
+    throw err;
+  }
+  if (order.status === 'delivered') {
+    const err = new Error('คำสั่งซื้อนี้ได้รับสินค้าแล้ว');
+    err.statusCode = 400;
+    throw err;
+  }
+  if (order.status === 'pending_payment') {
+    const err = new Error('กรุณาชำระเงินก่อนยืนยันรับสินค้า');
+    err.statusCode = 400;
+    throw err;
+  }
+  return update('orders', order.id, {
+    status: 'delivered',
+    deliveredAt: new Date().toISOString(),
+  });
+};
+
+module.exports = { createOrder, getMyOrders, getOrderById, confirmReceive, ORDER_STATUSES };

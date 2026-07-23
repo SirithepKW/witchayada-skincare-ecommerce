@@ -1,0 +1,43 @@
+[
+  {
+    "id": 1,
+    "username": "naphatsorn_k",
+    "email": "customer@glowtime.com",
+    "passwordHash": "$2a$10$v256/B42i/y.J0o1NxcTsuj6m21QCAJHiADB9SfGIhwV9QayHwV4K",
+    "role": "customer",
+    "createdAt": "2026-01-15T08:00:00+07:00",
+    "profile": {
+      "skinType": "sensitive",
+      "phone": "081-234-5678"
+    }
+  },
+  {
+    "id": 2,
+    "username": "jane_oily",
+    "email": "jane@glowtime.com",
+    "passwordHash": "$2a$10$v256/B42i/y.J0o1NxcTsuj6m21QCAJHiADB9SfGIhwV9QayHwV4K",
+    "role": "customer",
+    "createdAt": "2026-02-01T10:00:00+07:00",
+    "profile": {
+      "skinType": "oily",
+      "phone": "089-876-5432"
+    }
+  },
+  {
+    "id": 10,
+    "username": "kant_staff",
+    "email": "staff@glowtime.com",
+    "passwordHash": "$2a$10$v256/B42i/y.J0o1NxcTsuj6m21QCAJHiADB9SfGIhwV9QayHwV4K",
+    "role": "staff",
+    "position": "warehouse",
+    "createdAt": "2026-01-10T08:00:00+07:00"
+  },
+  {
+    "id": 20,
+    "username": "warakhon_mgr",
+    "email": "manager@glowtime.com",
+    "passwordHash": "$2a$10$v256/B42i/y.J0o1NxcTsuj6m21QCAJHiADB9SfGIhwV9QayHwV4K",
+    "role": "manager",
+    "createdAt": "2025-12-01T08:00:00+07:00"
+  }
+]

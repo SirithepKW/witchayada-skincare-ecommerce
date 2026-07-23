@@ -134,6 +134,11 @@ const Orders = {
     const res = await apiFetch(`/api/orders/${orderId}`);
     return res.data;
   },
+
+  async confirmReceive(orderId) {
+    const res = await apiFetch(`/api/orders/${orderId}/receive`, { method: 'PUT' });
+    return res.data;
+  },
 };
 
 // ── Reviews ────────────────────────────────────────────

@@ -98,5 +98,44 @@ router.get('/',  orderController.getMyOrders);
  */
 router.get('/:orderId', orderController.getOrderById);
 
+/**
+ * @openapi
+ * /api/orders/{orderId}/receive:
+ *   put:
+ *     tags: [Orders]
+ *     summary: ยืนยันรับสินค้า (เปลี่ยนสถานะเป็น delivered)
+ *     description: ลูกค้ากดยืนยันว่าได้รับสินค้าแล้ว — อนุญาตเมื่อสถานะเป็น confirmed หรือ shipping
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: orderId
+ *         required: true
+ *         schema: { type: string }
+ *         example: ORD-20260722-0001
+ *     responses:
+ *       200:
+ *         description: ยืนยันรับสินค้าสำเร็จ (status = delivered)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: boolean, example: true }
+ *                 message: { type: string, example: ยืนยันรับสินค้าเรียบร้อย }
+ *                 data: { $ref: '#/components/schemas/Order' }
+ *       400:
+ *         description: สถานะไม่ถูกต้อง (ยังไม่ชำระเงิน หรือรับสินค้าไปแล้ว)
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
+ *       404:
+ *         description: ไม่พบคำสั่งซื้อ
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/ErrorResponse' }
+ */
+router.put('/:orderId/receive', orderController.confirmReceive);
+
 module.exports = router;
 

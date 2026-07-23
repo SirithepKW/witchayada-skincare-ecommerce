@@ -1,0 +1,136 @@
+/* ════════════════════════════════════════════════════
+   GLOWTIME — Base Styles (ใช้ร่วมกันทุกหน้า)
+   nav, footer, toast, ปุ่ม, modal พื้นฐาน, ฟอร์ม
+════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black:  #0A0A0A;
+  --white:  #FFFFFF;
+  --cream:  #F7F5F2;
+  --warm:   #EDE9E3;
+  --gray:   #888;
+  --border: #E0DDD8;
+  --serif:  'Cormorant Garamond', Georgia, serif;
+  --sans:   'Inter', sans-serif;
+  --pink:   #e91e8c;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--white); color: var(--black); font-size: 14px; line-height: 1.6; }
+
+/* ── NAV ─────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.2rem 3rem;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: var(--serif); font-size: 1.4rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); text-decoration: none; }
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a { text-decoration: none; color: var(--gray); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 400; transition: color 0.2s; }
+.nav-links a:hover { color: var(--black); }
+.nav-actions { display: flex; gap: 0.8rem; align-items: center; }
+
+/* cart badge */
+.nav-cart-btn {
+  position: relative; background: none; border: none; cursor: pointer;
+  font-size: 1.1rem; color: var(--gray); transition: color 0.2s; padding: 0.2rem;
+}
+.nav-cart-btn:hover { color: var(--black); }
+.cart-count {
+  position: absolute; top: -4px; right: -6px;
+  background: var(--black); color: #fff;
+  font-size: 0.55rem; min-width: 16px; height: 16px;
+  border-radius: 50%; display: none;
+  align-items: center; justify-content: center;
+  font-family: var(--sans); font-weight: 500;
+}
+.cart-count.visible { display: flex; }
+
+/* guest cart badge */
+.guest-cart-wrap { position: relative; }
+.guest-cart-badge {
+  position: absolute; top: -4px; right: -6px;
+  background: #8B6F5E; color: #fff;
+  font-size: 0.55rem; min-width: 16px; height: 16px;
+  border-radius: 50%; display: none;
+  align-items: center; justify-content: center;
+  font-family: var(--sans); font-weight: 500;
+}
+.guest-cart-badge.visible { display: flex; }
+
+/* auth nav */
+.nav-btn { background: none; border: none; font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); cursor: pointer; padding: 0.5rem 0.4rem; transition: opacity .2s; text-decoration: none; }
+.nav-btn:hover { opacity: 0.55; }
+.nav-cta { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); text-decoration: none; border: 1px solid var(--black); padding: 0.5rem 1rem; transition: all .2s; }
+.nav-cta:hover { background: var(--black); color: #fff; }
+#navUser { display: flex; align-items: center; gap: 0.6rem; }
+#navUsername { font-size: 0.72rem; letter-spacing: 0.08em; color: var(--gray); }
+
+/* ── TOAST ───────────────────────────────── */
+#toast {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 2000;
+  background: var(--black); color: #fff;
+  padding: 0.75rem 1.4rem; font-size: 0.78rem; letter-spacing: 0.04em;
+  border-radius: 2px; opacity: 0; transform: translateY(8px);
+  transition: opacity 0.25s, transform 0.25s; pointer-events: none;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.error { background: #8B3A3A; }
+
+/* ── BUTTONS ─────────────────────────────── */
+.btn-dark { background: var(--black); color: var(--white); padding: 0.85rem 2rem; font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; border: none; cursor: pointer; text-decoration: none; display: inline-block; transition: opacity 0.2s; }
+.btn-dark:hover { opacity: 0.75; }
+.btn-ghost { background: transparent; color: var(--black); padding: 0.85rem 2rem; font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid var(--black); cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.2s; }
+.btn-ghost:hover { background: var(--black); color: var(--white); }
+
+/* ── FOOTER ──────────────────────────────── */
+footer { background: var(--black); color: rgba(255,255,255,0.35); padding: 3rem 5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center; }
+.footer-logo { font-family: var(--serif); font-size: 1.4rem; color: var(--white); letter-spacing: 0.12em; text-transform: uppercase; }
+.footer-info { font-size: 0.72rem; line-height: 1.8; text-align: right; }
+
+/* ── MODAL BASE ──────────────────────────── */
+.overlay { position: fixed; inset: 0; background: rgba(10,10,10,0.55); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1.5rem; }
+.overlay.open { display: flex; }
+.modal { background: #fff; width: 100%; max-width: 420px; padding: 2.6rem 2.4rem; border-radius: 4px; position: relative; box-shadow: 0 30px 80px rgba(0,0,0,0.3); animation: modalIn .25s ease; }
+@keyframes modalIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.modal-close { position: absolute; top: 0.9rem; right: 1.1rem; background: none; border: none; font-size: 1.5rem; color: var(--gray); cursor: pointer; line-height: 1; }
+.modal-close:hover { color: var(--black); }
+.modal-eyebrow { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gray); margin-bottom: 0.5rem; }
+.modal-title { font-family: var(--serif); font-size: 2rem; font-weight: 300; margin-bottom: 1.6rem; }
+.modal-alt { text-align: center; font-size: 0.8rem; color: var(--gray); margin-top: 1.3rem; }
+.modal-alt button { background: none; border: none; color: var(--black); cursor: pointer; font-size: 0.8rem; text-decoration: underline; }
+
+/* ── FORMS ───────────────────────────────── */
+.form-field { margin-bottom: 1rem; }
+.form-field label { display: block; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray); margin-bottom: 0.4rem; }
+.form-field input, .form-field select { width: 100%; padding: 0.8rem 0.9rem; border: 1px solid var(--border); font-family: var(--sans); font-size: 0.9rem; background: #fff; }
+.form-field input:focus, .form-field select:focus { outline: none; border-color: var(--black); }
+.form-submit { width: 100%; padding: 0.9rem; background: var(--black); color: #fff; border: none; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; margin-top: 0.5rem; transition: opacity .2s; }
+.form-submit:hover { opacity: 0.85; }
+.form-submit:disabled { opacity: 0.5; cursor: default; }
+.form-error { font-size: 0.78rem; color: #8B3A3A; margin-top: 0.6rem; min-height: 1.2em; }
+
+/* ── EMPTY / LOADING TEXT ────────────────── */
+.cart-empty { text-align: center; color: var(--gray); padding: 2rem 0; font-size: 0.85rem; }
+
+/* ── REVIEW MODAL (ใช้ทั้งหน้าแรกและหน้าออเดอร์) ── */
+.star-picker { display: flex; gap: 0.4rem; font-size: 1.8rem; cursor: pointer; margin: 0.3rem 0 0.8rem; }
+.star-picker span { color: #D8D4CC; transition: color .15s; }
+.star-picker span.on { color: #C9A84C; }
+.review-textarea {
+  width: 100%; min-height: 100px; padding: 0.7rem 0.9rem; resize: vertical;
+  border: 1px solid var(--border); font-family: inherit; font-size: 0.85rem; outline: none;
+}
+.review-textarea:focus { border-color: var(--black); }
+
+/* ── RESPONSIVE (shared) ─────────────────── */
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  footer { grid-template-columns: 1fr; }
+  .footer-info { text-align: left; }
+}

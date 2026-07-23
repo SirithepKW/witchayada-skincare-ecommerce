@@ -21,7 +21,9 @@ const getReviewsByProduct = async (productId) => {
 };
 
 /**
- * เขียนรีวิว (ต้องไม่รีวิวซ้ำในออเดอร์เดียวกัน)
+ * เขียนรีวิว (Verified Purchase)
+ * — ต้องเคยซื้อสินค้านี้และออเดอร์นั้นมีสถานะ delivered แล้วเท่านั้น
+ * — ลูกค้า 1 คน รีวิวสินค้าแต่ละชิ้นได้ 1 ครั้ง
  */
 const createReview = async (customerId, { productId, orderId, rating, comment }) => {
   if (!rating || rating < 1 || rating > 5) {
@@ -54,7 +56,8 @@ const createReview = async (customerId, { productId, orderId, rating, comment })
     id: result.insertId,
     productId: Number(productId),
     customerId,
-    orderId: orderId || null,
+    // ถ้า frontend ไม่ส่ง orderId มา ให้ผูกกับออเดอร์แรกที่ซื้อสินค้านี้อัตโนมัติ
+    orderId: orderId || purchasedOrders[0].orderId,
     rating: Number(rating),
     comment: comment.trim(),
   };

@@ -8,13 +8,13 @@
       {
         "orderItemId": 1,
         "productId": 1001,
-        "productName": "Hyaluronic Acid Serum 30ml",
+        "productName": "Hydrating Serum",
         "qty": 1,
-        "unitPrice": 590.00,
-        "subtotal": 590.00
+        "unitPrice": 590.0,
+        "subtotal": 590.0
       }
     ],
-    "totalAmount": 590.00,
+    "totalAmount": 590.0,
     "shippingAddress": {
       "recipient": "นภัสสร ใส่ใจผิว",
       "address": "123/45 ถ.สุขุมวิท",

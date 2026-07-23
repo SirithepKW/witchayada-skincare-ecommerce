@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Orders — GLOWTIME</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css"/>
+  <link rel="stylesheet" href="css/orders.css"/>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">GLOWTIME</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="index.html#shop">Shop</a></li>
+  </ul>
+  <div class="nav-actions">
+    <span id="navUser" style="display:none;">
+      <span id="navUsername"></span>
+      <a href="index.html#shop" class="nav-btn">← Shop</a>
+      <button class="nav-btn" onclick="doLogout()">Logout</button>
+    </span>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MY ORDERS PAGE -->
+<main class="orders-page">
+  <div class="orders-container">
+    <p class="orders-eyebrow">Order History</p>
+    <h1 class="orders-title">My Orders</h1>
+    <div id="ordersList">
+      <p class="cart-empty">กำลังโหลด…</p>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <p class="footer-logo">GLOWTIME</p>
+    <p style="font-size:0.72rem; margin-top:0.5rem;">Premium Skincare Online Store</p>
+  </div>
+  <div class="footer-info">
+    CSI204 Digital Platform for Software Development<br/>
+    GLOWTIME — Customer Frontend
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════
+     WRITE REVIEW MODAL
+════════════════════════════════════════════════════ -->
+<div class="overlay" id="reviewModal" onclick="if(event.target===this)closeModal('reviewModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('reviewModal')">&times;</button>
+    <p class="modal-eyebrow">Share your thoughts</p>
+    <h2 class="modal-title">เขียนรีวิว</h2>
+    <p style="font-size:0.85rem; color:var(--gray); margin-bottom:1rem;" id="reviewProductName"></p>
+    <form id="reviewForm" onsubmit="return handleSubmitReview(event)">
+      <div class="form-field">
+        <label>ให้คะแนน</label>
+        <div class="star-picker" id="starPicker">
+          <span data-v="1">★</span><span data-v="2">★</span><span data-v="3">★</span><span data-v="4">★</span><span data-v="5">★</span>
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="reviewComment">ความคิดเห็น</label>
+        <textarea id="reviewComment" class="review-textarea" placeholder="สินค้าเป็นอย่างไรบ้าง? ใช้แล้วผิวเป็นยังไง…" required></textarea>
+      </div>
+      <div class="form-error" id="reviewError"></div>
+      <button type="submit" class="form-submit" id="reviewSubmit">ส่งรีวิว</button>
+    </form>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="api.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/review.js"></script>
+<script src="js/orders.js"></script>
+</body>
+</html>

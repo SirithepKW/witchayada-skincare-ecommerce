@@ -1,0 +1,50 @@
+/* ════════════════════════════════════════════════════
+   GLOWTIME — My Orders Page Styles
+   การ์ดออเดอร์, status timeline, ฟอร์มรีวิว
+════════════════════════════════════════════════════ */
+
+/* ── PAGE LAYOUT ─────────────────────────── */
+.orders-page { margin-top: 60px; min-height: calc(100vh - 60px); background: var(--cream); padding: 4rem 1.5rem 5rem; }
+.orders-container { max-width: 680px; margin: 0 auto; }
+.orders-eyebrow { font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gray); margin-bottom: 0.5rem; }
+.orders-title { font-family: var(--serif); font-size: 2.4rem; font-weight: 300; margin-bottom: 2rem; }
+
+/* ── ORDER CARD ──────────────────────────── */
+.order-card { background: #fff; border: 1px solid var(--border); padding: 1.4rem 1.6rem; margin-bottom: 1.2rem; }
+.order-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+.order-id { font-family: var(--sans); font-size: 0.78rem; letter-spacing: 0.06em; font-weight: 600; }
+.order-date { font-size: 0.7rem; color: var(--gray); }
+.order-items-mini { font-size: 0.78rem; color: #444; line-height: 1.7; margin-bottom: 0.8rem; }
+.order-total-row { display: flex; justify-content: space-between; font-size: 0.82rem; padding-top: 0.6rem; border-top: 1px dashed var(--border); }
+.order-total-row strong { font-family: var(--serif); font-size: 1.05rem; }
+
+/* ── STATUS TIMELINE ─────────────────────── */
+.status-track { display: flex; align-items: center; margin: 0.9rem 0 1rem; }
+.status-step { flex: 1; text-align: center; position: relative; }
+.status-dot {
+  width: 14px; height: 14px; border-radius: 50%; margin: 0 auto 0.35rem;
+  background: #fff; border: 2px solid var(--border); position: relative; z-index: 2;
+}
+.status-step.done .status-dot { background: var(--black); border-color: var(--black); }
+.status-step.current .status-dot { background: #fff; border-color: var(--black); box-shadow: 0 0 0 3px rgba(0,0,0,0.12); }
+.status-label { font-family: var(--sans); font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray); }
+.status-step.done .status-label, .status-step.current .status-label { color: var(--black); font-weight: 600; }
+.status-line { position: absolute; top: 6px; left: -50%; width: 100%; height: 2px; background: var(--border); z-index: 1; }
+.status-step.done .status-line { background: var(--black); }
+.status-step:first-child .status-line { display: none; }
+
+/* ── ORDER ACTIONS ───────────────────────── */
+.order-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.9rem; align-items: center; }
+.btn-receive {
+  background: var(--black); color: #fff; border: none; cursor: pointer;
+  padding: 0.55rem 1.2rem; font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.btn-receive:disabled { opacity: 0.5; cursor: default; }
+.btn-review-item {
+  background: transparent; color: var(--black); border: 1px solid var(--black); cursor: pointer;
+  padding: 0.55rem 1.2rem; font-family: var(--sans); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.btn-review-item:hover { background: var(--black); color: #fff; }
+.badge-delivered { font-family: var(--sans); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: #2E6B3E; }
+.note-pending { font-size: 0.72rem; color: #8B6F5E; }
+/* (สไตล์ review modal ย้ายไปอยู่ base.css เพราะใช้ร่วมกับหน้าแรก) */

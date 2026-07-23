@@ -2,17 +2,8 @@
   {
     "id": 1,
     "customerId": 1,
-    "items": [
-      {
-        "cartItemId": 1,
-        "productId": 1001,
-        "productName": "Hyaluronic Acid Serum 30ml",
-        "unitPrice": 590.00,
-        "qty": 2,
-        "subtotal": 1180.00
-      }
-    ],
-    "totalAmount": 1180.00,
+    "items": [],
+    "totalAmount": 0,
     "updatedAt": "2026-07-22T10:10:00+07:00"
   }
 ]

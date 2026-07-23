@@ -1,0 +1,20 @@
+[
+  {
+    "id": 501,
+    "orderId": "ORD-20260701-0001",
+    "trackingNumber": "TH123456789EX",
+    "carrier": "Kerry Express",
+    "status": "in_transit",
+    "shippedAt": "2026-07-01T15:00:00+07:00",
+    "deliveredAt": null
+  },
+  {
+    "id": 502,
+    "orderId": "ORD-20260705-0001",
+    "trackingNumber": "FL987654321TH",
+    "carrier": "Flash Express",
+    "status": "delivered",
+    "shippedAt": "2026-07-05T13:00:00+07:00",
+    "deliveredAt": "2026-07-07T10:30:00+07:00"
+  }
+]

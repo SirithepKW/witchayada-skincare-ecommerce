@@ -1,0 +1,106 @@
+[
+  {
+    "id": 1,
+    "orderId": "ORD-20260701-0001",
+    "customerId": 1,
+    "status": "delivered",
+    "items": [
+      {
+        "orderItemId": 1,
+        "productId": 1001,
+        "productName": "Hyaluronic Acid Serum 30ml",
+        "qty": 1,
+        "unitPrice": 590.00,
+        "subtotal": 590.00
+      }
+    ],
+    "totalAmount": 590.00,
+    "shippingAddress": {
+      "recipient": "นภัสสร ใส่ใจผิว",
+      "address": "123/45 ถ.สุขุมวิท",
+      "province": "กรุงเทพมหานคร",
+      "postalCode": "10110"
+    },
+    "createdAt": "2026-07-01T10:15:00+07:00"
+  },
+  {
+    "id": 2,
+    "orderId": "ORD-20260702-0001",
+    "customerId": 2,
+    "status": "pending_payment",
+    "items": [
+      {
+        "orderItemId": 1,
+        "productId": 1003,
+        "productName": "Oil Control Moisturizer 50ml",
+        "qty": 1,
+        "unitPrice": 380.00,
+        "subtotal": 380.00
+      },
+      {
+        "orderItemId": 2,
+        "productId": 1006,
+        "productName": "Sunscreen SPF50+ PA++++ 50ml",
+        "qty": 2,
+        "unitPrice": 320.00,
+        "subtotal": 640.00
+      }
+    ],
+    "totalAmount": 1020.00,
+    "shippingAddress": {
+      "recipient": "เจน ผิวมัน",
+      "address": "88 ถ.เพชรบุรี",
+      "province": "กรุงเทพมหานคร",
+      "postalCode": "10400"
+    },
+    "createdAt": "2026-07-02T14:30:00+07:00"
+  },
+  {
+    "id": 3,
+    "orderId": "ORD-20260703-0001",
+    "customerId": 1,
+    "status": "shipping",
+    "items": [
+      {
+        "orderItemId": 1,
+        "productId": 1004,
+        "productName": "Soothing Centella Cream 30g",
+        "qty": 1,
+        "unitPrice": 650.00,
+        "subtotal": 650.00
+      }
+    ],
+    "totalAmount": 650.00,
+    "shippingAddress": {
+      "recipient": "นภัสสร ใส่ใจผิว",
+      "address": "123/45 ถ.สุขุมวิท",
+      "province": "กรุงเทพมหานคร",
+      "postalCode": "10110"
+    },
+    "createdAt": "2026-07-03T09:00:00+07:00"
+  },
+  {
+    "id": 4,
+    "orderId": "ORD-20260705-0001",
+    "customerId": 2,
+    "status": "confirmed",
+    "items": [
+      {
+        "orderItemId": 1,
+        "productId": 1002,
+        "productName": "Vitamin C Brightening Toner 150ml",
+        "qty": 1,
+        "unitPrice": 450.00,
+        "subtotal": 450.00
+      }
+    ],
+    "totalAmount": 450.00,
+    "shippingAddress": {
+      "recipient": "เจน ผิวมัน",
+      "address": "88 ถ.เพชรบุรี",
+      "province": "กรุงเทพมหานคร",
+      "postalCode": "10400"
+    },
+    "createdAt": "2026-07-05T11:20:00+07:00"
+  }
+]

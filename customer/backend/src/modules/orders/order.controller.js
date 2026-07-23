@@ -31,4 +31,15 @@ const getOrderById = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { createOrder, getMyOrders, getOrderById };
+/**
+ * PUT /api/orders/:orderId/receive
+ * ลูกค้ายืนยันว่าได้รับสินค้าแล้ว → status = delivered
+ */
+const confirmReceive = (req, res, next) => {
+  try {
+    const order = orderService.confirmReceive(req.user.userId, req.params.orderId);
+    res.json({ success: true, message: 'ยืนยันรับสินค้าเรียบร้อย', data: order });
+  } catch (err) { next(err); }
+};
+
+module.exports = { createOrder, getMyOrders, getOrderById, confirmReceive };
