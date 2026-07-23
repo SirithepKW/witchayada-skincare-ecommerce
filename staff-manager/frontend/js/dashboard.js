@@ -365,9 +365,68 @@ function closeDetailModal() {
   if (modal) modal.classList.remove('open');
 }
 
+
+// ── DOM Load Trigger ───────────────────────────────────────────────
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initDashboardCharts();
+    loadDashboardFromAPI();
+  });
+} else {
+  initDashboardCharts();
+  loadDashboardFromAPI();
+}
+
+// ── Fetch Real Data from Backend (Reports API) ─────────────
+async function loadDashboardFromAPI() {
+  if (!window.GlowtimeAdminAPI) return;
+
+  try {
+    // 1. Sales Report
+    const salesData = await window.GlowtimeAdminAPI.Reports.getSales();
+    if (salesData) {
+      const revEl = document.getElementById('statTotalRevenue');
+      const ordEl = document.getElementById('statTotalOrders');
+      const revMetaEl = document.getElementById('statTotalRevenueMeta');
+
+      if (revEl) revEl.textContent = '฿' + Number(salesData.totalRevenue || 0).toLocaleString();
+      if (ordEl) ordEl.textContent = salesData.totalOrders || 0;
+      if (revMetaEl) revMetaEl.textContent = `Delivered: ${salesData.deliveredCount || 0} | Shipping: ${salesData.shippingCount || 0}`;
+    }
+
+    // 2. Stock Report
+    const stockData = await window.GlowtimeAdminAPI.Reports.getStock();
+    if (stockData) {
+      const lowStockEl = document.getElementById('statLowStock');
+      const stockListEl = document.getElementById('lowStockAlertList');
+
+      if (lowStockEl) lowStockEl.textContent = stockData.lowStockProducts || 0;
+
+      if (stockListEl && Array.isArray(stockData.products)) {
+        const lowItems = stockData.products.filter(p => p.status === 'low' || p.status === 'out');
+        if (lowItems.length > 0) {
+          stockListEl.innerHTML = lowItems.slice(0, 5).map(p => `
+            <div class="alert-item" style="display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0; border-bottom:1px solid var(--border);">
+              <div>
+                <strong style="font-size:0.82rem;">${p.name}</strong>
+                <div style="font-size:0.7rem; color:var(--gray);">${p.category} — ${p.brand}</div>
+              </div>
+              <span class="status-badge ${p.status === 'out' ? 'badge-danger' : 'badge-warning'}">
+                ${p.stockQty === 0 ? 'Out of Stock' : p.stockQty + ' left'}
+              </span>
+            </div>
+          `).join('');
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[dashboard.js] ไม่สามารถโหลดข้อมูล reports จาก backend:', e.message);
+  }
+
 // ── DOM Load Trigger ──────────────────────────────────────────
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initDashboardCharts);
 } else {
   initDashboardCharts();
+
 }

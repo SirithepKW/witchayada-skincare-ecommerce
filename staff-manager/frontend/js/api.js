@@ -2,11 +2,19 @@
  * GLOWTIME — Staff & Admin Frontend API Client (js/api.js)
  * ─────────────────────────────────────────────────────────────
  * Wrapper รอบ fetch() เพื่อเชื่อมต่อระหว่าง Admin Frontend และ Admin/Staff Backend
+
+ * Base URL: http://localhost:5001 (Staff & Manager Backend)
+ * ─────────────────────────────────────────────────────────────
+ */
+
+const ADMIN_API_BASE = 'http://localhost:5001';
+
  * Base URL: http://localhost:5000 (หรือเซิร์ฟเวอร์ที่ Deploy)
  * ─────────────────────────────────────────────────────────────
  */
 
 const ADMIN_API_BASE = 'http://localhost:5000';
+
 
 // ── Token & Auth Helpers ─────────────────────────────────────
 const getAdminToken = () => localStorage.getItem('glowtime_token') || sessionStorage.getItem('glowtime_admin_token');
@@ -82,6 +90,17 @@ const AdminAuth = {
 
   isLoggedIn: () => localStorage.getItem('adminLoggedIn') === 'true' || sessionStorage.getItem('adminLoggedIn') === 'true' || !!getAdminToken(),
   currentUser: getAdminUser,
+
+
+  async getProfile() {
+    try {
+      const res = await adminApiFetch('/api/auth/profile');
+      return res.data; // { id, username, email, role, ... }
+    } catch {
+      return null;
+    }
+  },
+
 };
 
 // ── Admin Products Module ─────────────────────────────────────
@@ -89,7 +108,11 @@ const AdminProducts = {
   async list(filters = {}) {
     try {
       const params = new URLSearchParams(filters).toString();
+
+      const res = await adminApiFetch(`/api/manager/products${params ? '?' + params : ''}`);
+
       const res = await adminApiFetch(`/api/products${params ? '?' + params : ''}`);
+
       return res.data;
     } catch {
       return null; // fallback ให้หน้า UI ใช้ mock data เดิมถ้าไม่ได้เปิด backend
@@ -120,17 +143,31 @@ const AdminProducts = {
   async updateStock(productId, stockQty) {
     const res = await adminApiFetch(`/api/staff/stock/${productId}`, {
       method: 'PUT',
+
+      body: JSON.stringify({ stockQty }),  // ← ใช้ key "stockQty" ตรงกับ backend
+    });
+    return res.data;
+  },
+
       body: JSON.stringify({ stock: stockQty }),
     });
     return res.data;
   }
+
 };
 
 // ── Admin Orders Module ───────────────────────────────────────
 const AdminOrders = {
+
+  async list(filters = {}) {
+    try {
+      const params = new URLSearchParams(filters).toString();
+      const res = await adminApiFetch(`/api/staff/orders${params ? '?' + params : ''}`);
+
   async list() {
     try {
       const res = await adminApiFetch('/api/staff/orders');
+
       return res.data;
     } catch {
       return null;
@@ -145,6 +182,103 @@ const AdminOrders = {
     return res.data;
   },
 
+
+  async addShipment(orderId, trackingNumber, carrier) {
+    const res = await adminApiFetch('/api/staff/shipments', {
+      method: 'POST',
+      body: JSON.stringify({ orderId, trackingNumber, carrier }),
+    });
+    return res.data;
+  },
+};
+
+// ── Admin Reports Module ──────────────────────────────────────
+const AdminReports = {
+  async getSales() {
+    try {
+      const res = await adminApiFetch('/api/manager/reports/sales');
+      return res.data;
+    } catch {
+      return null;
+    }
+  },
+
+  async getStock() {
+    try {
+      const res = await adminApiFetch('/api/manager/reports/stock');
+      return res.data;
+    } catch {
+      return null;
+    }
+  },
+};
+
+// ── Admin Users Module ────────────────────────────────────────
+const AdminUsers = {
+  async list(filters = {}) {
+    try {
+      const params = new URLSearchParams(filters).toString();
+      const res = await adminApiFetch(`/api/manager/users${params ? '?' + params : ''}`);
+      return res.data;
+    } catch {
+      return null;
+    }
+  },
+
+  async update(id, data) {
+    const res = await adminApiFetch(`/api/manager/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return res.data;
+  },
+
+  async delete(id) {
+    const res = await adminApiFetch(`/api/manager/users/${id}`, { method: 'DELETE' });
+    return res.data;
+  },
+};
+
+// ── Admin Shipments Module ────────────────────────────────────
+const AdminShipments = {
+  async list() {
+    try {
+      const res = await adminApiFetch('/api/staff/shipments');
+      return res.data;
+    } catch {
+      return null;
+    }
+  },
+
+  async getByOrderId(orderId) {
+    try {
+      const res = await adminApiFetch(`/api/staff/shipments/${orderId}`);
+      return res.data;
+    } catch {
+      return null;
+    }
+  },
+};
+
+// ── Admin Stock Module ────────────────────────────────────────
+const AdminStock = {
+  async list() {
+    try {
+      const res = await adminApiFetch('/api/staff/stock');
+      return res.data;
+    } catch {
+      return null;
+    }
+  },
+
+  async update(productId, stockQty) {
+    const res = await adminApiFetch(`/api/staff/stock/${productId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ stockQty }),
+    });
+    return res.data;
+  },
+
   async addShipment(orderId, trackingNumber, courier) {
     const res = await adminApiFetch('/api/staff/shipments', {
       method: 'POST',
@@ -152,13 +286,26 @@ const AdminOrders = {
     });
     return res.data;
   }
+
 };
 
 // Export to Global Scope
 window.GlowtimeAdminAPI = {
+
+  Auth:      AdminAuth,
+  Products:  AdminProducts,
+  Orders:    AdminOrders,
+  Reports:   AdminReports,
+  Users:     AdminUsers,
+  Shipments: AdminShipments,
+  Stock:     AdminStock,
+  getAdminToken,
+  getAdminUser,
+
   Auth: AdminAuth,
   Products: AdminProducts,
   Orders: AdminOrders,
   getAdminToken,
   getAdminUser
+
 };

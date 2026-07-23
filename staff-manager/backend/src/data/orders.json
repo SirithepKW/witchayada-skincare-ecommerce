@@ -4,6 +4,8 @@
     "orderId": "ORD-20260701-0001",
     "customerId": 1,
     "status": "delivered",
+    "paymentMethod": "PromptPay QR Code",
+    "slipRef": "SLIP-20260701-1122",
     "items": [
       {
         "orderItemId": 1,
@@ -17,17 +19,24 @@
     "totalAmount": 590.00,
     "shippingAddress": {
       "recipient": "นภัสสร ใส่ใจผิว",
+      "phone": "081-234-5678",
       "address": "123/45 ถ.สุขุมวิท",
       "province": "กรุงเทพมหานคร",
       "postalCode": "10110"
     },
-    "createdAt": "2026-07-01T10:15:00+07:00"
+    "trackingNo": "KRY-11223344-TH",
+    "approvedAt": "2026-07-01T10:30:00+07:00",
+    "deliveredAt": "2026-07-03T14:15:00+07:00",
+    "createdAt": "2026-07-01T10:15:00+07:00",
+    "updatedAt": "2026-07-03T14:15:00+07:00"
   },
   {
     "id": 2,
     "orderId": "ORD-20260702-0001",
     "customerId": 2,
     "status": "pending_payment",
+    "paymentMethod": "PromptPay QR Code",
+    "slipRef": "SLIP-20260702-9988",
     "items": [
       {
         "orderItemId": 1,
@@ -49,17 +58,21 @@
     "totalAmount": 1020.00,
     "shippingAddress": {
       "recipient": "เจน ผิวมัน",
+      "phone": "089-876-5432",
       "address": "88 ถ.เพชรบุรี",
       "province": "กรุงเทพมหานคร",
       "postalCode": "10400"
     },
-    "createdAt": "2026-07-02T14:30:00+07:00"
+    "createdAt": "2026-07-02T14:30:00+07:00",
+    "updatedAt": "2026-07-02T14:30:00+07:00"
   },
   {
     "id": 3,
     "orderId": "ORD-20260703-0001",
     "customerId": 1,
     "status": "shipping",
+    "paymentMethod": "Credit Card (VISA *** 4921)",
+    "slipRef": "TXN-20260703-4921",
     "items": [
       {
         "orderItemId": 1,
@@ -73,17 +86,23 @@
     "totalAmount": 650.00,
     "shippingAddress": {
       "recipient": "นภัสสร ใส่ใจผิว",
+      "phone": "081-234-5678",
       "address": "123/45 ถ.สุขุมวิท",
       "province": "กรุงเทพมหานคร",
       "postalCode": "10110"
     },
-    "createdAt": "2026-07-03T09:00:00+07:00"
+    "trackingNo": "FLE-55667788-TH",
+    "approvedAt": "2026-07-03T09:30:00+07:00",
+    "createdAt": "2026-07-03T09:00:00+07:00",
+    "updatedAt": "2026-07-03T11:00:00+07:00"
   },
   {
     "id": 4,
     "orderId": "ORD-20260705-0001",
     "customerId": 2,
     "status": "confirmed",
+    "paymentMethod": "Credit Card (Mastercard *** 8812)",
+    "slipRef": "TXN-20260705-8812",
     "items": [
       {
         "orderItemId": 1,
@@ -97,10 +116,13 @@
     "totalAmount": 450.00,
     "shippingAddress": {
       "recipient": "เจน ผิวมัน",
+      "phone": "089-876-5432",
       "address": "88 ถ.เพชรบุรี",
       "province": "กรุงเทพมหานคร",
       "postalCode": "10400"
     },
-    "createdAt": "2026-07-05T11:20:00+07:00"
+    "approvedAt": "2026-07-05T12:00:00+07:00",
+    "createdAt": "2026-07-05T11:20:00+07:00",
+    "updatedAt": "2026-07-05T12:00:00+07:00"
   }
 ]
