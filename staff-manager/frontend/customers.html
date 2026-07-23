@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Customers &amp; Skin Profiles — GLOWTIME Staff &amp; Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script>if(localStorage.getItem('adminLoggedIn')==='true'||sessionStorage.getItem('adminLoggedIn')==='true')document.documentElement.classList.add('admin-logged-in');</script>
+  <link rel="stylesheet" href="css/admin.css"/>
+</head>
+<body>
+
+<!-- ── AUTH LOCK OVERLAY ── -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <span class="auth-badge">SkincareShop · Admin Protection</span>
+    <h2 class="auth-title">Admin Authentication</h2>
+    <p class="auth-desc">Please sign in to access the admin system</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <div class="form-group">
+        <label>Username / Email</label>
+        <input type="text" id="adminUser" class="form-control" value="admin" required placeholder="admin@skincareshop.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" class="form-control" value="password123" required>
+      </div>
+      <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="admin-container">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <header class="topbar" data-title="Customers &amp; Skin Profiles" data-sub="Order history, skin profile, loyalty points, and customer interactions"></header>
+
+    <!-- CUSTOMER TABLE -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Customers &amp; Skin Profiles</h3>
+        <button class="btn-dark-sm" onclick="showToast('Skin Segment Campaign sent!')">Send Skin Segment Campaign</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Customer &amp; Email</th>
+              <th>Skin Profile</th>
+              <th>Membership Tier</th>
+              <th>Loyalty Points</th>
+              <th>Total Spend</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>#USR-101</strong></td>
+              <td><strong>ศิรินทร์ภา วงศ์อุบล</strong><br/><span style="font-size:0.68rem; color:#777;">customer@glowtime.com</span></td>
+              <td><span class="status-badge badge-warning">Sensitive / Redness</span></td>
+              <td><span class="status-badge badge-success">Gold Member</span></td>
+              <td><strong>1,450 pts</strong></td>
+              <td>฿12,800</td>
+              <td><button class="btn-ghost-sm" onclick="viewCustomer(101)">View History</button></td>
+            </tr>
+            <tr>
+              <td><strong>#USR-102</strong></td>
+              <td><strong>เจนนิสา อนันต์</strong><br/><span style="font-size:0.68rem; color:#777;">jane@glowtime.com</span></td>
+              <td><span class="status-badge badge-info">Oily / Acne-prone</span></td>
+              <td><span class="status-badge badge-info">Silver Member</span></td>
+              <td><strong>620 pts</strong></td>
+              <td>฿4,500</td>
+              <td><button class="btn-ghost-sm" onclick="viewCustomer(102)">View History</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REVIEW MODERATION SECTION -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Review Moderation &amp; Q&amp;A</h3>
+        <span class="status-badge badge-warning">2 Reviews Pending Approval</span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date &amp; Reviewer</th>
+              <th>Product Reviewed</th>
+              <th>Rating</th>
+              <th>Review Text / Question</th>
+              <th>Approval Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>22 Jul 2026<br/><strong>ศิรินทร์ภา วงศ์อุบล</strong></td>
+              <td>Hyaluronic Acid Serum 30ml</td>
+              <td>★★★★★ (5/5)</td>
+              <td>"Skin felt noticeably softer and more hydrated. No irritation at all — perfect for sensitive skin!"</td>
+              <td><span class="status-badge badge-warning">Pending Review</span></td>
+              <td>
+                <button class="btn-dark-sm" style="background:var(--status-success);" onclick="showToast('Review approved and published!')">Approve</button>
+                <button class="btn-ghost-sm" style="color:var(--status-danger);" onclick="showToast('Review hidden')">Hide</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── MODAL: CUSTOMER PROFILE ── -->
+<div class="modal-backdrop" id="modalCustomer" style="align-items: flex-start; padding-top: 3rem;">
+  <div class="modal-box" style="max-width: 700px;">
+    <div class="modal-header">
+      <h3 class="modal-title" id="custModalTitle">Customer Profile</h3>
+      <button class="modal-close" type="button" onclick="closeModal('modalCustomer')">&#x2715;</button>
+    </div>
+
+    <!-- Profile Summary -->
+    <div style="display:flex; gap:1.5rem; align-items:center; padding: 1rem 0 1.5rem; border-bottom: 1px solid var(--border);">
+      <div style="width:60px; height:60px; border-radius:50%; background:var(--dark); color:white; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:700; flex-shrink:0;" id="custAvatar">SK</div>
+      <div style="flex:1;">
+        <div style="font-size:1rem; font-weight:700;" id="custName">-</div>
+        <div style="font-size:0.78rem; color:var(--gray);" id="custEmail">-</div>
+        <div style="margin-top:0.4rem; display:flex; gap:0.5rem; flex-wrap:wrap;" id="custBadges"></div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; text-align:center;">
+        <div style="background:var(--cream); padding:0.6rem 1rem; border-radius:6px;">
+          <div style="font-size:0.65rem; color:var(--gray); text-transform:uppercase; letter-spacing:.05em;">Loyalty Points</div>
+          <div style="font-weight:700; font-size:1.1rem;" id="custPoints">-</div>
+        </div>
+        <div style="background:var(--cream); padding:0.6rem 1rem; border-radius:6px;">
+          <div style="font-size:0.65rem; color:var(--gray); text-transform:uppercase; letter-spacing:.05em;">Total Spend</div>
+          <div style="font-weight:700; font-size:1.1rem;" id="custSpend">-</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order History -->
+    <div style="margin-top:1.2rem;">
+      <h4 style="font-size:0.85rem; font-weight:600; margin-bottom:0.8rem;">Order History</h4>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Date</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="custOrderHistory"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const customersData = {
+  101: {
+    name: 'ศิรินทร์ภา วงศ์อุบล',
+    email: 'customer@glowtime.com',
+    skinProfile: 'Sensitive / Redness',
+    tier: 'Gold Member',
+    tierClass: 'badge-success',
+    points: '1,450 pts',
+    spend: '฿12,800',
+    orders: [
+      { id: '#ORD-0723-004', date: '23 Jul 2026', items: 'Hydrating Serum × 2', total: '฿1,180', status: 'Delivered', statusClass: 'badge-success' },
+      { id: '#ORD-0715-011', date: '15 Jul 2026', items: 'Renewal Cream × 1', total: '฿890', status: 'Delivered', statusClass: 'badge-success' },
+      { id: '#ORD-0701-003', date: '01 Jul 2026', items: 'Gentle Cleanser × 1, Rose Barrier × 1', total: '฿1,080', status: 'Delivered', statusClass: 'badge-success' },
+    ]
+  },
+  102: {
+    name: 'เจนนิสา อนันต์',
+    email: 'jane@glowtime.com',
+    skinProfile: 'Oily / Acne-prone',
+    tier: 'Silver Member',
+    tierClass: 'badge-info',
+    points: '620 pts',
+    spend: '฿4,500',
+    orders: [
+      { id: '#ORD-0720-008', date: '20 Jul 2026', items: 'Niacinamide 10% Serum × 1', total: '฿550', status: 'Delivered', statusClass: 'badge-success' },
+      { id: '#ORD-0710-005', date: '10 Jul 2026', items: 'Glow Mask × 2, Daily SPF 50+ × 1', total: '฿1,390', status: 'Delivered', statusClass: 'badge-success' },
+      { id: '#ORD-0625-002', date: '25 Jun 2026', items: 'Gentle Cleanser × 2', total: '฿780', status: 'Delivered', statusClass: 'badge-success' },
+    ]
+  }
+};
+
+function viewCustomer(id) {
+  const c = customersData[id];
+  if (!c) return;
+
+  document.getElementById('custModalTitle').innerText = 'Customer Profile — ' + c.name;
+  document.getElementById('custAvatar').innerText = c.name.slice(0, 2);
+  document.getElementById('custName').innerText = c.name;
+  document.getElementById('custEmail').innerText = c.email;
+  document.getElementById('custPoints').innerText = c.points;
+  document.getElementById('custSpend').innerText = c.spend;
+
+  document.getElementById('custBadges').innerHTML = `
+    <span class="status-badge badge-warning">${c.skinProfile}</span>
+    <span class="status-badge ${c.tierClass}">${c.tier}</span>
+  `;
+
+  document.getElementById('custOrderHistory').innerHTML = c.orders.map(o => `
+    <tr>
+      <td><strong>${o.id}</strong></td>
+      <td>${o.date}</td>
+      <td>${o.items}</td>
+      <td>${o.total}</td>
+      <td><span class="status-badge ${o.statusClass}">${o.status}</span></td>
+    </tr>
+  `).join('');
+
+  openModal('modalCustomer');
+}
+</script>
+
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/topbar.js"></script>
+<script src="js/sidebar.js"></script>
+</body>
+</html>

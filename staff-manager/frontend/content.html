@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reviews &amp; Content — GLOWTIME Staff &amp; Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script>if(localStorage.getItem('adminLoggedIn')==='true'||sessionStorage.getItem('adminLoggedIn')==='true')document.documentElement.classList.add('admin-logged-in');</script>
+  <link rel="stylesheet" href="css/admin.css"/>
+</head>
+<body>
+
+<!-- ── AUTH LOCK OVERLAY ── -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <span class="auth-badge">SkincareShop · Admin Protection</span>
+    <h2 class="auth-title">Admin Authentication</h2>
+    <p class="auth-desc">Please sign in to access the admin system</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <div class="form-group">
+        <label>Username / Email</label>
+        <input type="text" id="adminUser" class="form-control" value="admin" required placeholder="admin@skincareshop.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" class="form-control" value="password123" required>
+      </div>
+      <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="admin-container">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <header class="topbar" data-title="Reviews &amp; Content" data-sub="Moderate customer reviews, manage blog articles, and track FDA compliance"></header>
+
+    <!-- CUSTOMER REVIEWS MODERATION -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Customer Reviews</h3>
+        <button class="btn-dark-sm" onclick="showToast('Reviews refreshed successfully')">Refresh Reviews</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Rating</th>
+              <th>Product</th>
+              <th>Customer</th>
+              <th>Review Text</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span style="color:#D4AF37; font-weight:bold;">★ 5.0</span></td>
+              <td><strong>Hydrating Serum</strong> (#1001)</td>
+              <td>นภัสสร ใส่ใจผิว <div style="font-size:0.7rem; color:#777;">Dry / Sensitive</div></td>
+              <td>"Works amazingly well — no irritation at all. Skin felt noticeably more hydrated after 2 weeks of use."</td>
+              <td><span class="status-badge badge-success">Approved</span></td>
+              <td>
+                <button class="btn-ghost-sm" onclick="showToast('Review hidden from product page')">Hide</button>
+                <button class="btn-ghost-sm" style="color:var(--status-danger);" onclick="showToast('Review deleted')">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td><span style="color:#D4AF37; font-weight:bold;">★ 4.0</span></td>
+              <td><strong>Daily SPF 50+</strong> (#1007)</td>
+              <td>ศิรินทร์ภา วงศ์อุบล <div style="font-size:0.7rem; color:#777;">Combination</div></td>
+              <td>"Lightweight formula, no white cast at all. Delivery was 1 day later than expected though."</td>
+              <td><span class="status-badge badge-success">Approved</span></td>
+              <td>
+                <button class="btn-ghost-sm" onclick="showToast('Review hidden from product page')">Hide</button>
+                <button class="btn-ghost-sm" style="color:var(--status-danger);" onclick="showToast('Review deleted')">Delete</button>
+              </td>
+            </tr>
+            <tr>
+              <td><span style="color:#D4AF37; font-weight:bold;">★ 5.0</span></td>
+              <td><strong>Renewal Cream</strong> (#1002)</td>
+              <td>ภัทรพงศ์ อนันต์ <div style="font-size:0.7rem; color:#777;">Normal</div></td>
+              <td>"Applied before bed and woke up with visibly plumper, softer skin. Love the subtle scent too!"</td>
+              <td><span class="status-badge badge-warning">Pending Moderation</span></td>
+              <td>
+                <button class="btn-dark-sm" onclick="showToast('Review approved and published!')">Approve</button>
+                <button class="btn-ghost-sm" style="color:var(--status-danger);" onclick="showToast('Review deleted')">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FDA COMPLIANCE TABLE -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Thai FDA Registry</h3>
+        <button class="btn-dark-sm" onclick="showToast('FDA registry status verified successfully')">Verify FDA Status</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>FDA Registration No.</th>
+              <th>License Holder</th>
+              <th>License Expiry</th>
+              <th>Legal Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Hydrating Serum (GLOWTIME)</strong></td>
+              <td>10-1-6600012345</td>
+              <td>GLOWTIME Skincare Co., Ltd.</td>
+              <td>14/05/2028</td>
+              <td><span class="status-badge badge-success">Approved</span></td>
+            </tr>
+            <tr>
+              <td><strong>Renewal Cream (GLOWTIME)</strong></td>
+              <td>10-1-6600098765</td>
+              <td>GLOWTIME Skincare Co., Ltd.</td>
+              <td>20/11/2027</td>
+              <td><span class="status-badge badge-success">Approved</span></td>
+            </tr>
+            <tr>
+              <td><strong>Daily SPF 50+ (GLOWTIME)</strong></td>
+              <td>10-1-6600054321</td>
+              <td>GLOWTIME Skincare Co., Ltd.</td>
+              <td>10/01/2028</td>
+              <td><span class="status-badge badge-success">Approved</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BLOG & ARTICLES -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Skin Care Blog &amp; Education</h3>
+        <button class="btn-dark-sm" onclick="showToast('Opening new blog post editor...')">+ New Article</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Article Title</th>
+              <th>Category</th>
+              <th>Author</th>
+              <th>Views</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>5 Ways to Strengthen Your Skin Barrier for Sensitive Skin</strong></td>
+              <td>Sensitive Skin Guide</td>
+              <td>Visada K.</td>
+              <td>4,250 views</td>
+              <td><span class="status-badge badge-success">Published</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/topbar.js"></script>
+<script src="js/sidebar.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+========================================================
+  วิธีใส่รูปสินค้า (SkincareShop)
+========================================================
+
+นำรูปสินค้าของคุณมาวางในโฟลเดอร์นี้ (images/products/)
+แล้วตั้งชื่อไฟล์ให้ "ตรงตามรายการด้านล่าง" เป๊ะๆ
+
+รองรับนามสกุล .jpg และ .png  (ระบบจะลอง .jpg ก่อน ถ้าไม่เจอจะลอง .png)
+ถ้ายังไม่ใส่รูป → หน้าเว็บจะโชว์ emoji เดิมไว้ก่อนโดยอัตโนมัติ
+
+--------------------------------------------------------
+ รายการชื่อไฟล์ที่ต้องใช้
+--------------------------------------------------------
+  hydrating-serum.jpg       → Hydrating Serum   (Serums)
+  renewal-cream.jpg         → Renewal Cream     (Moisturizers)
+  radiance-oil.jpg          → Radiance Oil      (Oils)
+  gentle-cleanser.jpg       → Gentle Cleanser   (Cleansers)
+  hydrating-mist.jpg        → Hydrating Mist    (Mists)
+  glow-mask.jpg             → Glow Mask         (Masks)
+  daily-spf-50.jpg          → Daily SPF 50+     (Sunscreen)
+  niacinamide-10.jpg        → Niacinamide 10%   (Serums)
+  rose-barrier-cream.jpg    → Rose Barrier Cream(Moisturizers)
+
+--------------------------------------------------------
+ เคล็ดลับ
+--------------------------------------------------------
+- ขนาดรูปแนะนำ สัดส่วน 3:4 (เช่น 600 x 800 px) จะพอดีกับการ์ดสินค้า
+- รูปจะถูกครอบให้เต็มกรอบอัตโนมัติ (object-fit: cover)
+- ถ้าอยากเพิ่มสินค้าใหม่ ให้ copy การ์ดเดิมใน index.html / products.html
+  แล้วแก้ src ของ <img class="product-img"> ให้ชี้ไฟล์รูปใหม่
+
+ไฟล์รูปเดียวกันนี้จะถูกใช้ทั้งในหน้า Home, Shop, Cart และ Checkout
+========================================================

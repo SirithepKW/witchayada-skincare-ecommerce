@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GLOWTIME — Dashboard & Analytics Suite</title>
+  <script>if(localStorage.getItem('adminLoggedIn')==='true'||sessionStorage.getItem('adminLoggedIn')==='true')document.documentElement.classList.add('admin-logged-in');</script>
+  <link rel="stylesheet" href="css/admin.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- ── AUTH LOGIN OVERLAY ── -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <span class="auth-badge">SkincareShop · Admin Protection</span>
+    <h2 class="auth-title">Admin Authentication</h2>
+    <p class="auth-desc">กรุณาลงชื่อเข้าใช้ด้วยบัญชีผู้ดูแลระบบเพื่อเข้าสู่ระบบจัดการ</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <div class="form-group">
+        <label>Username / Email</label>
+        <input type="text" id="adminUser" class="form-control" value="admin" required placeholder="admin@skincareshop.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" class="form-control" value="password123" required>
+      </div>
+      <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+    </form>
+    <p style="margin-top: 1.2rem; font-size: 0.72rem; color: var(--gray); text-align: center;">
+      Demo Admin Credential: <strong>admin</strong> / <strong>password123</strong>
+    </p>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="admin-container">
+  
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="main-content">
+    
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div>
+        <h1 class="page-title">Dashboard & Analytics</h1>
+        <p class="page-sub">ศูนย์รวมวิเคราะห์ข้อมูลยอดขาย สถิติการสั่งซื้อ และข้อมูลสภาพผิวเชิงลึก</p>
+      </div>
+
+      <div class="topbar-actions">
+        <!-- Timeframe Selector -->
+        <div class="time-filter-group">
+          <button class="time-filter-btn active" onclick="switchTimeframe('7D', this)">7 Days</button>
+          <button class="time-filter-btn" onclick="switchTimeframe('30D', this)">30 Days</button>
+          <button class="time-filter-btn" onclick="switchTimeframe('1Y', this)">1 Year</button>
+        </div>
+
+        <div class="search-box">
+          <span style="color:var(--gray); font-size:0.8rem;">&#x2315;</span>
+          <input type="text" placeholder="Search products, orders, customers..." onkeyup="globalSearch(this.value)">
+        </div>
+
+        <div style="position:relative;">
+          <div class="notif-bell" onclick="toggleNotifDrawer()">
+            <span style="font-size:1rem;">&#9825;</span><span class="notif-dot"></span>
+          </div>
+
+          <div class="notif-drawer" id="notifDrawer">
+            <div class="notif-header">
+              <h4>System Alerts (3)</h4>
+              <span style="font-size:0.65rem; color:var(--gray); cursor:pointer;" onclick="clearNotifs()">Mark all read</span>
+            </div>
+            <div class="notif-list">
+              <div class="notif-item">
+                <strong>New Order #ORD-20260722-0001</strong>
+                <p>Payment ฿1,500 via PromptPay</p>
+                <div class="time">2 mins ago</div>
+              </div>
+              <div class="notif-item">
+                <strong>Low Stock Alert</strong>
+                <p>Radiance Oil — only 4 units remaining</p>
+                <div class="time">15 mins ago</div>
+              </div>
+              <div class="notif-item">
+                <strong>Sales Record Reached</strong>
+                <p>This week's revenue exceeded target by 24.8%</p>
+                <div class="time">1 hour ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOP RIGHT USER PROFILE DROPDOWN -->
+        <div class="user-dropdown-wrapper" style="position:relative;">
+          <button class="user-profile-btn" onclick="toggleUserDropdown(event)">
+            <div class="user-avatar">VK</div>
+            <div class="user-details">
+              <span class="user-name">Visada K.</span>
+              <span class="user-role">Super Admin ▼</span>
+            </div>
+          </button>
+          
+          <div class="user-dropdown-menu" id="userDropdown">
+            <div class="dropdown-header">
+              <strong>Visada K.</strong>
+              <p>admin@skincareshop.com</p>
+              <span class="status-badge badge-success" style="margin-top:0.4rem;">Super Administrator</span>
+            </div>
+            <hr style="border:0; border-top:1px solid var(--border); margin:0.5rem 0;"/>
+            <button onclick="showToast('System settings opened')" class="dropdown-item">Settings</button>
+            <button onclick="lockAdminSession()" class="dropdown-item logout">Logout</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Net Total Revenue</div>
+        <div class="stat-value" id="statTotalRevenue">฿519,000</div>
+        <div class="stat-meta" id="statTotalRevenueMeta">▲ +24.8% vs last week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value">1,248</div>
+        <div class="stat-meta">▲ +42 orders today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Registered Customers</div>
+        <div class="stat-value">1,102</div>
+        <div class="stat-meta">▲ +18 members this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Low Stock Inventory</div>
+        <div class="stat-value" style="color:var(--status-danger);">1 Product</div>
+        <div class="stat-meta down">Reorder replenishment needed</div>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE CHARTS SECTION -->
+    <div class="charts-grid" style="margin-bottom:2rem;">
+      <!-- Chart 1: Revenue & Orders Trend -->
+      <div class="chart-box" style="grid-column: span 2;">
+        <div class="card-header" style="margin-bottom:1rem;">
+          <div>
+            <h3 class="card-title">Revenue & Order Performance Trend</h3>
+            <p style="font-size:0.75rem; color:var(--gray); margin-top:0.2rem;">Dual-axis relationship between gross revenue (bars) and order volume (line)</p>
+          </div>
+        </div>
+        <div class="chart-card-inner" style="height: 280px;">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECONDARY CHARTS GRID -->
+    <div class="charts-grid">
+      <!-- Chart 2: Category Share -->
+      <div class="chart-box">
+        <div class="card-header" style="margin-bottom:1rem;">
+          <h3 class="card-title">Sales Revenue Share by Category</h3>
+          <span class="status-badge badge-success">Live Breakdown</span>
+        </div>
+        <div class="chart-card-inner" style="height: 220px;">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 3: Customer Skin Types -->
+      <div class="chart-box">
+        <div class="card-header" style="margin-bottom:1rem;">
+          <h3 class="card-title">Customer Target Skin Types</h3>
+        </div>
+        <div class="chart-card-inner" style="height: 220px;">
+          <canvas id="skinTypeChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE TABLES SECTION -->
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top:2rem;">
+      
+      <!-- Table 1: Top Selling Products (Clickable Rows) -->
+      <div class="content-card">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title">Top Selling Products</h3>
+            <p class="table-hover-hint">Click any product row to inspect detailed performance breakdown</p>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Total Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="clickable-row" onclick="inspectProduct(1001)">
+                <td><strong>Hydrating Serum 30ml</strong></td>
+                <td><span class="status-badge badge-info">Serum</span></td>
+                <td>฿590</td>
+                <td><strong style="color:#4A6741;">฿283,200</strong> (480 units)</td>
+              </tr>
+              <tr class="clickable-row" onclick="inspectProduct(1002)">
+                <td><strong>Daily SPF 50+ Sunscreen</strong></td>
+                <td><span class="status-badge badge-warning">Sunscreen</span></td>
+                <td>฿490</td>
+                <td><strong style="color:#4A6741;">฿151,900</strong> (310 units)</td>
+              </tr>
+              <tr class="clickable-row" onclick="inspectProduct(1003)">
+                <td><strong>Renewal Cream 50g</strong></td>
+                <td><span class="status-badge badge-info">Moisturizer</span></td>
+                <td>฿890</td>
+                <td><strong style="color:#4A6741;">฿195,800</strong> (220 units)</td>
+              </tr>
+              <tr class="clickable-row" onclick="inspectProduct(1004)">
+                <td><strong>Gentle Cleanser 150ml</strong></td>
+                <td><span class="status-badge badge-success">Cleanser</span></td>
+                <td>฿390</td>
+                <td><strong style="color:#4A6741;">฿76,050</strong> (195 units)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Table 2: Recent Orders (Clickable Rows) -->
+      <div class="content-card">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title">Recent Orders</h3>
+            <p class="table-hover-hint">Click any order row to inspect customer and payment slip details</p>
+          </div>
+          <a href="orders.html" class="btn-ghost-sm">View All Orders →</a>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="clickable-row" onclick="inspectOrder('ORD-1')">
+                <td><strong>#ORD-20260722-0001</strong></td>
+                <td>Sirinpha Wongs-ubon</td>
+                <td>฿1,500</td>
+                <td><span class="status-badge badge-warning">Pending Payment</span></td>
+              </tr>
+              <tr class="clickable-row" onclick="inspectOrder('ORD-2')">
+                <td><strong>#ORD-20260722-0002</strong></td>
+                <td>Pattarapong Anan</td>
+                <td>฿450</td>
+                <td><span class="status-badge badge-info">Confirmed (Paid)</span></td>
+              </tr>
+              <tr class="clickable-row" onclick="inspectOrder('ORD-3')">
+                <td><strong>#ORD-20260701-0001</strong></td>
+                <td>Natnicha Kittichuang</td>
+                <td>฿590</td>
+                <td><span class="status-badge badge-success">Delivered</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- ── DETAIL INSPECTION MODAL OVERLAY ── -->
+<div class="admin-modal-overlay" id="detailModalOverlay" onclick="if(event.target===this)closeDetailModal()">
+  <div class="admin-modal-box">
+    <div class="admin-modal-header">
+      <h3 id="detailModalTitle" style="margin:0; font-size:1.05rem; color:var(--white);">ข้อมูลรายละเอียด</h3>
+      <button onclick="closeDetailModal()" style="background:none; border:none; color:var(--white); font-size:1.4rem; cursor:pointer;">&times;</button>
+    </div>
+    <div class="admin-modal-body" id="detailModalBody"></div>
+  </div>
+</div>
+
+<!-- ── TOAST CONTAINER ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── JAVASCRIPT LOGIC ── -->
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/topbar.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

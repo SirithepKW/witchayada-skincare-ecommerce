@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>System Settings — GLOWTIME Staff & Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script>if(localStorage.getItem('adminLoggedIn')==='true'||sessionStorage.getItem('adminLoggedIn')==='true')document.documentElement.classList.add('admin-logged-in');</script>
+  <link rel="stylesheet" href="css/admin.css"/>
+  <style>
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+    }
+    
+    .settings-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .settings-nav-item {
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--gray);
+      transition: all 0.2s ease;
+      background: transparent;
+      border: none;
+      text-align: left;
+    }
+
+    .settings-nav-item:hover {
+      background: var(--cream);
+      color: var(--dark);
+    }
+
+    .settings-nav-item.active {
+      background: var(--dark);
+      color: white;
+    }
+    
+    .settings-panel {
+      display: none;
+    }
+    
+    .settings-panel.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── AUTH LOCK OVERLAY ── -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <span class="auth-badge">SkincareShop · Admin Protection</span>
+    <h2 class="auth-title">Admin Authentication</h2>
+    <p class="auth-desc">Please sign in to access the admin system</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <div class="form-group">
+        <label>Username / Email</label>
+        <input type="text" id="adminUser" class="form-control" value="admin" required placeholder="admin@skincareshop.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" class="form-control" value="password123" required>
+      </div>
+      <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="admin-container">
+  
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <header class="topbar" data-title="System Settings" data-sub="Manage your account profile, security, and global preferences"></header>
+
+    <div class="settings-grid">
+      <!-- Left Nav -->
+      <div class="content-card" style="align-self: start;">
+        <h3 class="card-title" style="margin-bottom: 1.5rem; font-size: 1.1rem;">Settings Menu</h3>
+        <div class="settings-nav">
+          <button class="settings-nav-item active" onclick="switchSettingsPanel('profile', this)">My Profile</button>
+          <button class="settings-nav-item" onclick="switchSettingsPanel('security', this)">Password & Security</button>
+          <button class="settings-nav-item" onclick="switchSettingsPanel('notifications', this)">Notification Preferences</button>
+          <button class="settings-nav-item" onclick="switchSettingsPanel('store', this)">Store Configuration</button>
+        </div>
+      </div>
+
+      <!-- Right Panels -->
+      <div class="settings-content">
+        
+        <!-- PROFILE PANEL -->
+        <div class="content-card settings-panel active" id="panel-profile">
+          <div class="card-header">
+            <h3 class="card-title">My Profile</h3>
+          </div>
+          
+          <div style="display:flex; align-items:center; gap: 1.5rem; margin-bottom: 2rem;">
+            <div id="avatarPreview" style="width: 80px; height: 80px; border-radius: 50%; background: var(--dark); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 600; overflow: hidden; background-size: cover; background-position: center;">
+              <span id="avatarInitials">VK</span>
+            </div>
+            <div>
+              <input type="file" id="avatarUpload" accept="image/*" style="display:none;" onchange="previewAvatar(this)">
+              <button class="btn-ghost-sm" type="button" onclick="document.getElementById('avatarUpload').click()">Upload Avatar</button>
+              <p style="font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem;">Recommended size: 256x256px</p>
+            </div>
+          </div>
+          
+          <form onsubmit="event.preventDefault(); showToast('Profile updated successfully');">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" class="form-control" value="Visada">
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" class="form-control" value="K.">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" class="form-control" value="admin@skincareshop.com">
+            </div>
+            
+            <div class="form-group">
+              <label>Role</label>
+              <input type="text" class="form-control" value="Super Administrator" disabled style="background: var(--cream);">
+            </div>
+            
+            <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn-dark-sm">Save Changes</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- SECURITY PANEL -->
+        <div class="content-card settings-panel" id="panel-security">
+          <div class="card-header">
+            <h3 class="card-title">Password & Security</h3>
+          </div>
+          
+          <form onsubmit="event.preventDefault(); showToast('Password updated successfully');">
+            <div class="form-group">
+              <label>Current Password</label>
+              <input type="password" class="form-control" placeholder="Enter current password" required>
+            </div>
+            
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;" />
+            
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" class="form-control" placeholder="Enter new password" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Confirm New Password</label>
+              <input type="password" class="form-control" placeholder="Confirm new password" required>
+            </div>
+            
+            <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn-dark-sm">Update Password</button>
+            </div>
+          </form>
+          
+          <div style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+            <h4 style="margin-bottom: 1rem; color: var(--status-danger);">Danger Zone</h4>
+            <button class="btn-ghost-sm" style="color: var(--status-danger); border-color: var(--status-danger);" onclick="showToast('Cannot delete Super Admin account')">Delete My Account</button>
+          </div>
+        </div>
+
+        <!-- NOTIFICATIONS PANEL -->
+        <div class="content-card settings-panel" id="panel-notifications">
+          <div class="card-header">
+            <h3 class="card-title">Notification Preferences</h3>
+          </div>
+          
+          <div style="display:flex; flex-direction:column; gap: 1.2rem;">
+            <label style="display:flex; align-items:center; gap: 1rem; cursor: pointer;">
+              <input type="checkbox" checked style="width:1.2rem; height:1.2rem;">
+              <div>
+                <strong>New Order Alerts</strong>
+                <p style="font-size: 0.8rem; color: var(--gray);">Receive notifications when a new order is placed</p>
+              </div>
+            </label>
+            
+            <label style="display:flex; align-items:center; gap: 1rem; cursor: pointer;">
+              <input type="checkbox" checked style="width:1.2rem; height:1.2rem;">
+              <div>
+                <strong>Low Stock Alerts</strong>
+                <p style="font-size: 0.8rem; color: var(--gray);">Get notified when inventory falls below 10 units</p>
+              </div>
+            </label>
+            
+            <label style="display:flex; align-items:center; gap: 1rem; cursor: pointer;">
+              <input type="checkbox" style="width:1.2rem; height:1.2rem;">
+              <div>
+                <strong>Daily Summary Email</strong>
+                <p style="font-size: 0.8rem; color: var(--gray);">Send a daily sales report to your email</p>
+              </div>
+            </label>
+          </div>
+          
+          <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+            <button class="btn-dark-sm" onclick="showToast('Preferences saved')">Save Preferences</button>
+          </div>
+        </div>
+
+        <!-- STORE CONFIG PANEL -->
+        <div class="content-card settings-panel" id="panel-store">
+          <div class="card-header">
+            <h3 class="card-title">Store Configuration</h3>
+          </div>
+          
+          <form onsubmit="event.preventDefault(); showToast('Store settings updated');">
+            <div class="form-group">
+              <label>Store Name</label>
+              <input type="text" class="form-control" value="GLOWTIME Skincare">
+            </div>
+            
+            <div class="form-group">
+              <label>Support Email</label>
+              <input type="email" class="form-control" value="support@skincareshop.com">
+            </div>
+            
+            <div class="form-group">
+              <label>Currency Symbol</label>
+              <select class="form-control">
+                <option value="฿" selected>THB (฿)</option>
+                <option value="$">USD ($)</option>
+                <option value="€">EUR (€)</option>
+              </select>
+            </div>
+            
+            <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn-dark-sm">Save Store Configuration</button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── TOAST CONTAINER ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── JAVASCRIPT LOGIC ── -->
+<script>
+  function switchSettingsPanel(panelId, btnElement) {
+    document.querySelectorAll('.settings-nav-item').forEach(btn => btn.classList.remove('active'));
+    btnElement.classList.add('active');
+    
+    document.querySelectorAll('.settings-panel').forEach(panel => panel.classList.remove('active'));
+    document.getElementById('panel-' + panelId).classList.add('active');
+  }
+
+  function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const preview = document.getElementById('avatarPreview');
+        preview.style.backgroundImage = 'url(' + e.target.result + ')';
+        document.getElementById('avatarInitials').style.display = 'none';
+        if (typeof showToast === 'function') showToast('Avatar preview updated');
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/topbar.js"></script>
+<script src="js/sidebar.js"></script>
+</body>
+</html>

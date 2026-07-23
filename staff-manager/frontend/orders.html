@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>รายการสั่งซื้อ & ชำระเงิน (Order Operations) — GLOWTIME Staff & Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script>if(localStorage.getItem('adminLoggedIn')==='true'||sessionStorage.getItem('adminLoggedIn')==='true')document.documentElement.classList.add('admin-logged-in');</script>
+  <link rel="stylesheet" href="css/admin.css"/>
+</head>
+<body>
+
+<!-- ── AUTH LOGIN OVERLAY ── -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <span class="auth-badge">SkincareShop · Admin Protection</span>
+    <h2 class="auth-title">Admin Authentication</h2>
+    <p class="auth-desc">กรุณาลงชื่อเข้าใช้ด้วยบัญชีผู้ดูแลระบบเพื่อเข้าสู่ระบบจัดการ</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <div class="form-group">
+        <label>Username / Email</label>
+        <input type="text" id="adminUser" class="form-control" value="admin" required placeholder="admin@skincareshop.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" class="form-control" value="password123" required>
+      </div>
+      <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+    </form>
+    <p style="margin-top: 1.2rem; font-size: 0.72rem; color: var(--gray); text-align: center;">
+      Demo Admin Credential: <strong>admin</strong> / <strong>password123</strong>
+    </p>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="admin-container">
+  
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="main-content">
+    
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div>
+        <h1 class="page-title">Orders & Payments</h1>
+        <p class="page-sub">ตรวจสอบรายการสั่งซื้อ ตรวจสลิป และอัปเดตสถานะจัดส่ง</p>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="ค้นหาสินค้า, คำสั่งซื้อ, ลูกค้า..." onkeyup="globalSearch(this.value)">
+        </div>
+
+        <div style="position:relative;">
+          <div class="notif-bell" onclick="toggleNotifDrawer()">
+            🔔 <span class="notif-dot"></span>
+          </div>
+
+          <div class="notif-drawer" id="notifDrawer">
+            <div class="notif-header">
+              <h4>System Alerts (3)</h4>
+              <span style="font-size:0.65rem; color:var(--gray); cursor:pointer;" onclick="clearNotifs()">Mark all read</span>
+            </div>
+            <div class="notif-list">
+              <div class="notif-item">
+                <strong>New Order #ORD-20260722-0001</strong>
+                <p>ยอดชำระ ฿1,500 ผ่าน PromptPay</p>
+                <div class="time">2 นาทีที่แล้ว</div>
+              </div>
+              <div class="notif-item">
+                <strong>Low Stock Alert!</strong>
+                <p>Radiance Oil คงเหลือเพียง 4 ชิ้น</p>
+                <div class="time">15 นาทีที่แล้ว</div>
+              </div>
+              <div class="notif-item">
+                <strong>LINE Notify Webhook Active</strong>
+                <p>ส่งการแจ้งเตือนคำสั่งซื้อไปยังกลุ่ม Admin แล้ว</p>
+                <div class="time">1 ชั่วโมงที่แล้ว</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOP RIGHT USER PROFILE DROPDOWN -->
+        <div class="user-dropdown-wrapper" style="position:relative;">
+          <button class="user-profile-btn" onclick="toggleUserDropdown(event)">
+            <div class="user-avatar">VK</div>
+            <div class="user-details">
+              <span class="user-name">Visada K.</span>
+              <span class="user-role">Super Admin ▼</span>
+            </div>
+          </button>
+          
+          <div class="user-dropdown-menu" id="userDropdown">
+            <div class="dropdown-header">
+              <strong>Visada K.</strong>
+              <p>admin@skincareshop.com</p>
+              <span class="status-badge badge-success" style="margin-top:0.4rem;">Super Administrator</span>
+            </div>
+            <hr style="border:0; border-top:1px solid var(--border); margin:0.5rem 0;"/>
+            <button onclick="showToast('เปิดการตั้งค่าระบบผู้ดูแล')" class="dropdown-item">Settings</button>
+            <button onclick="lockAdminSession()" class="dropdown-item logout">Logout</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ORDER MANAGEMENT CONTENT -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Orders & Payments</h3>
+        <span class="status-badge badge-info">3 Active Orders</span>
+      </div>
+
+      <div class="filter-row">
+        <button class="btn-dark-sm" onclick="filterOrders('all')">All Orders (3)</button>
+        <button class="btn-ghost-sm" onclick="filterOrders('pending_payment')">⏳ Pending Payment</button>
+        <button class="btn-ghost-sm" onclick="filterOrders('confirmed')">Confirmed / Paid</button>
+        <button class="btn-ghost-sm" onclick="filterOrders('shipping')">Shipping / In Transit</button>
+        <button class="btn-ghost-sm" onclick="filterOrders('delivered')">Delivered</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID & Date</th>
+              <th>Customer & Address</th>
+              <th>Items Ordered</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="orderTableBody">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── MODAL: ORDER DETAIL & STATUS UPDATE ── -->
+<div class="modal-backdrop" id="modalOrderDetail">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">รายละเอียดคำสั่งซื้อ <span id="modalOrdId">ORD-20260722-0001</span></h3>
+      <button class="modal-close" onclick="closeModal('modalOrderDetail')">✕</button>
+    </div>
+    
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom:1.5rem;">
+      <div id="modalCustomerInfo">
+        <!-- Customer Address & Items rendered here -->
+      </div>
+      <div id="modalPaymentActionBox">
+        <!-- Dynamic Payment & Fulfillment actions rendered here -->
+      </div>
+    </div>
+
+    <div style="margin-bottom:1.5rem;">
+      <h4 style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); margin-bottom:0.6rem;">อัปเดตสถานะคำสั่งซื้อ (PUT /api/orders/:id/status)</h4>
+      <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+        <button class="btn-ghost-sm" onclick="updateOrderStatus('pending_payment')">⏳ pending_payment (รอชำระ)</button>
+        <button class="btn-dark-sm" onclick="updateOrderStatus('confirmed')">confirmed (ยืนยันรับเงิน/เตรียมจัดส่ง)</button>
+        <button class="btn-ghost-sm" onclick="updateOrderStatus('shipping')">shipping (กำลังจัดส่ง)</button>
+        <button class="btn-ghost-sm" onclick="updateOrderStatus('delivered')">delivered (ส่งสำเร็จ)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST CONTAINER ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── JAVASCRIPT LOGIC ── -->
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/topbar.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/orders.js"></script>
+</body>
+</html>

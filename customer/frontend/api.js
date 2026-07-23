@@ -65,24 +65,54 @@ const Auth = {
   currentUser: getUser,
 };
 
+const MOCK_PRODUCTS = [
+  { id: 1001, name: "Hydrating Serum", brand: "GLOWTIME", category: "Serum", skinTypeTarget: ["dry", "sensitive", "normal"], ingredients: ["Hyaluronic Acid", "Vitamin B5", "Ceramide"], description: "เซรั่มเติมน้ำเข้มข้น ด้วย Hyaluronic Acid 3 โมเลกุล ช่วยกักเก็บความชุ่มชื้นลึกถึงชั้นผิว เหมาะกับผิวแห้งและผิวแพ้ง่าย ซึมไวไม่เหนียวเหนอะหนะ", price: 590, stockQty: 120, expiryDate: "2028-06-30", images: ["images/products/hydrating-serum.jpg"], averageRating: 4.5, reviewCount: 2 },
+  { id: 1002, name: "Renewal Cream", brand: "GLOWTIME", category: "Moisturizer", skinTypeTarget: ["dry", "normal"], ingredients: ["Peptide Complex", "Squalane", "Shea Butter"], description: "ครีมฟื้นบำรุงผิวยามค่ำคืน ด้วย Peptide Complex ช่วยให้ผิวดูเรียบเนียน กระชับ พร้อม Squalane เติมความชุ่มชื้นตลอดคืน", price: 890, stockQty: 80, expiryDate: "2028-03-31", images: ["images/products/renewal-cream.jpg"], averageRating: 4.8, reviewCount: 5 },
+  { id: 1003, name: "Radiance Oil", brand: "GLOWTIME", category: "Oil", skinTypeTarget: ["dry", "normal"], ingredients: ["Rosehip Oil", "Jojoba Oil", "Vitamin E"], description: "เฟซออยล์บำรุงผิวให้เปล่งประกาย ด้วยน้ำมันโรสฮิปสกัดเย็นอุดมวิตามิน ช่วยให้ผิวนุ่ม ดูสุขภาพดี", price: 750, stockQty: 60, expiryDate: "2027-12-31", images: ["images/products/radiance-oil.jpg"], averageRating: 4.6, reviewCount: 3 },
+  { id: 1004, name: "Gentle Cleanser", brand: "GLOWTIME", category: "Cleanser", skinTypeTarget: ["all", "sensitive", "dry", "oily", "combination", "normal"], ingredients: ["Amino Acid Surfactant", "Glycerin"], description: "เจลล้างหน้าสูตรอ่อนโยน pH สมดุล ทำความสะอาดหมดจดโดยไม่ทำให้ผิวแห้งตึง", price: 390, stockQty: 200, expiryDate: "2028-09-30", images: ["images/products/gentle-cleanser.jpg"], averageRating: 4.7, reviewCount: 8 },
+  { id: 1005, name: "Hydrating Mist", brand: "GLOWTIME", category: "Mist", skinTypeTarget: ["all", "sensitive", "dry", "oily", "combination", "normal"], ingredients: ["Rose Water", "Hyaluronic Acid"], description: "สเปรย์น้ำแร่ผสมน้ำกุหลาบ ฉีดเติมความสดชื่นระหว่างวัน", price: 320, stockQty: 150, expiryDate: "2028-01-31", images: ["images/products/hydrating-mist.jpg"], averageRating: 4.4, reviewCount: 4 },
+  { id: 1006, name: "Glow Mask", brand: "GLOWTIME", category: "Mask", skinTypeTarget: ["combination", "oily", "normal"], ingredients: ["Kaolin Clay", "Vitamin C"], description: "มาส์กโคลนผสมวิตามินซี ช่วยดูดซับความมันส่วนเกิน ผลัดเซลล์ผิวอย่างอ่อนโยน", price: 450, stockQty: 90, expiryDate: "2027-10-31", images: ["images/products/glow-mask.jpg"], averageRating: 4.9, reviewCount: 6 },
+  { id: 1007, name: "Daily SPF 50+", brand: "GLOWTIME", category: "Sunscreen", skinTypeTarget: ["all", "sensitive", "dry", "oily", "combination", "normal"], ingredients: ["Zinc Oxide", "Niacinamide"], description: "กันแดดเนื้อบางเบา SPF50+ PA++++ ไม่ทิ้งคราบขาว", price: 490, stockQty: 180, expiryDate: "2028-05-31", images: ["images/products/daily-spf-50.jpg"], averageRating: 4.8, reviewCount: 12 },
+  { id: 1008, name: "Niacinamide 10%", brand: "GLOWTIME", category: "Serum", skinTypeTarget: ["oily", "combination"], ingredients: ["Niacinamide 10%", "Zinc PCA"], description: "เซรั่มไนอาซินาไมด์เข้มข้น 10% ช่วยลดเลือนรูขุมขน ควบคุมความมัน", price: 550, stockQty: 110, expiryDate: "2028-04-30", images: ["images/products/niacinamide-10.jpg"], averageRating: 4.6, reviewCount: 7 },
+  { id: 1009, name: "Rose Barrier Cream", brand: "GLOWTIME", category: "Moisturizer", skinTypeTarget: ["sensitive", "dry"], ingredients: ["Rose Extract", "Ceramide NP"], description: "ครีมเสริมเกราะป้องกันผิว กลิ่นกุหลาบอ่อนๆ ด้วย Ceramide", price: 690, stockQty: 70, expiryDate: "2028-02-29", images: ["images/products/rose-barrier-cream.jpg"], averageRating: 4.7, reviewCount: 9 }
+];
+
 // ── Products ───────────────────────────────────────────
 const Products = {
   async list(filters = {}) {
-    const params = new URLSearchParams();
-    if (filters.skinType) params.set('skinType', filters.skinType);
-    if (filters.brand) params.set('brand', filters.brand);
-    if (filters.category) params.set('category', filters.category);
-    if (filters.minPrice) params.set('minPrice', filters.minPrice);
-    if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
-    if (filters.search) params.set('search', filters.search);
-    const qs = params.toString();
-    const res = await apiFetch(`/api/products${qs ? '?' + qs : ''}`);
-    return res.data;
+    try {
+      const params = new URLSearchParams();
+      if (filters.skinType) params.set('skinType', filters.skinType);
+      if (filters.brand) params.set('brand', filters.brand);
+      if (filters.category) params.set('category', filters.category);
+      if (filters.minPrice) params.set('minPrice', filters.minPrice);
+      if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
+      if (filters.search) params.set('search', filters.search);
+      const qs = params.toString();
+      const res = await apiFetch(`/api/products${qs ? '?' + qs : ''}`);
+      return res.data;
+    } catch (e) {
+      console.warn('[CustomerAPI] Products API failed/offline, fallback to mock data');
+      let result = MOCK_PRODUCTS;
+      if (filters.skinType) {
+        const st = filters.skinType.toLowerCase();
+        result = result.filter(p => p.skinTypeTarget.includes(st) || p.skinTypeTarget.includes('all'));
+      }
+      if (filters.search) {
+        const q = filters.search.toLowerCase();
+        result = result.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.description.toLowerCase().includes(q));
+      }
+      return result;
+    }
   },
 
   async get(id) {
-    const res = await apiFetch(`/api/products/${id}`);
-    return res.data;
+    try {
+      const res = await apiFetch(`/api/products/${id}`);
+      return res.data;
+    } catch (e) {
+      return MOCK_PRODUCTS.find(p => p.id === Number(id)) || MOCK_PRODUCTS[0];
+    }
   },
 };
 

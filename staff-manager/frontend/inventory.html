@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventory &amp; Batches — GLOWTIME Staff &amp; Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script>if(localStorage.getItem('adminLoggedIn')==='true'||sessionStorage.getItem('adminLoggedIn')==='true')document.documentElement.classList.add('admin-logged-in');</script>
+  <link rel="stylesheet" href="css/admin.css"/>
+</head>
+<body>
+
+<!-- ── AUTH LOCK OVERLAY ── -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <span class="auth-badge">SkincareShop · Admin Protection</span>
+    <h2 class="auth-title">Admin Authentication</h2>
+    <p class="auth-desc">Please sign in to access the admin system</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <div class="form-group">
+        <label>Username / Email</label>
+        <input type="text" id="adminUser" class="form-control" value="admin" required placeholder="admin@skincareshop.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" class="form-control" value="password123" required>
+      </div>
+      <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="admin-container">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <header class="topbar" data-title="Inventory &amp; Batches" data-sub="Track batch/lot numbers, expiry warnings, suppliers, and cost price"></header>
+
+    <!-- BATCH & LOT TRACEABILITY TABLE -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Inventory &amp; Batches</h3>
+        <button class="btn-dark-sm" onclick="showToast('Opening Receive New Lot Batch form...')">+ Receive New Lot</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Batch / Lot No.</th>
+              <th>Product Name</th>
+              <th>Supplier</th>
+              <th>Cost Price</th>
+              <th>Qty Received</th>
+              <th>MFG Date</th>
+              <th>EXP Date</th>
+              <th>Lot Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>LOT-B8842</strong></td>
+              <td>Hydrating Serum (ID: #1001)</td>
+              <td>GLOWTIME OEM Co., Ltd.</td>
+              <td>฿180 / unit</td>
+              <td>500 units</td>
+              <td>01/06/2025</td>
+              <td>30/06/2028</td>
+              <td><span class="status-badge badge-success">In Stock</span></td>
+            </tr>
+            <tr>
+              <td><strong>LOT-C4410</strong></td>
+              <td>Daily SPF 50+ (ID: #1007)</td>
+              <td>GLOWTIME Lab Ltd.</td>
+              <td>฿150 / unit</td>
+              <td>5 units</td>
+              <td>15/05/2025</td>
+              <td>31/05/2028</td>
+              <td><span class="status-badge badge-danger">Low Stock (5 units)</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/topbar.js"></script>
+<script src="js/sidebar.js"></script>
+</body>
+</html>

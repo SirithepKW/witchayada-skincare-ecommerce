@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Coupons & Discounts — GLOWTIME Staff & Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script>if(localStorage.getItem('adminLoggedIn')==='true'||sessionStorage.getItem('adminLoggedIn')==='true')document.documentElement.classList.add('admin-logged-in');</script>
+  <link rel="stylesheet" href="css/admin.css"/>
+</head>
+<body>
+
+<!-- ── AUTH LOCK OVERLAY ── -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <span class="auth-badge">SkincareShop · Admin Protection</span>
+    <h2 class="auth-title">Admin Authentication</h2>
+    <p class="auth-desc">Please sign in to access the admin system</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <div class="form-group">
+        <label>Username / Email</label>
+        <input type="text" id="adminUser" class="form-control" value="admin" required placeholder="admin@skincareshop.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" class="form-control" value="password123" required>
+      </div>
+      <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+    </form>
+    <p style="margin-top: 1.2rem; font-size: 0.72rem; color: var(--gray); text-align: center;">
+      Demo Admin Credential: <strong>admin</strong> / <strong>password123</strong>
+    </p>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="admin-container">
+  
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    
+    <header class="topbar" data-title="Coupons & Discounts" data-sub="Manage discount codes, active coupons, and track usage history"></header>
+
+    <!-- METRICS -->
+    <div class="stats-grid" style="margin-bottom:2rem; grid-template-columns: repeat(3, 1fr);">
+      <div class="stat-card">
+        <div class="stat-label">Active Coupons</div>
+        <div class="stat-value" id="statActiveCoupons">-</div>
+        <div class="stat-meta">Ready to use</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Redemptions</div>
+        <div class="stat-value" id="statRedemptions">-</div>
+        <div class="stat-meta">Since beginning</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Discount Value Granted</div>
+        <div class="stat-value" style="color:var(--status-danger);">฿12,500</div>
+        <div class="stat-meta down">Total revenue impacted</div>
+      </div>
+    </div>
+
+    <!-- ALL COUPONS -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">All Coupons</h3>
+        <button class="btn-dark-sm" onclick="openAddCouponModal()">+ Add New Coupon</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Description</th>
+              <th>Discount Type</th>
+              <th>Usage</th>
+              <th>Expiration</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="couponTableBody">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- COUPON USAGE HISTORY -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Recent Usage History</h3>
+        <button class="btn-ghost-sm" onclick="showToast('Downloading CSV history')">Export History</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date &amp; Time</th>
+              <th>Coupon Code</th>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Discount Applied</th>
+            </tr>
+          </thead>
+          <tbody id="usageHistoryBody">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── MODAL: ADD / EDIT COUPON ── -->
+<div class="modal-backdrop" id="modalAddCoupon">
+  <div class="modal-box" style="max-width: 620px;">
+    <div class="modal-header">
+      <h3 class="modal-title" id="couponModalTitle">Add New Coupon</h3>
+      <button class="modal-close" type="button" onclick="closeModal('modalAddCoupon')">&#x2715;</button>
+    </div>
+    <form onsubmit="saveCoupon(event)" id="couponForm">
+      <input type="hidden" id="editCouponId" value="">
+
+      <!-- ROW 1: Code + Status -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Coupon Code <span style="color:var(--status-danger);">*</span></label>
+          <input type="text" id="couponCode" class="form-control" required placeholder="e.g. SUMMER30" style="text-transform: uppercase;">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" id="couponStatus">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label>Description <span style="color:var(--status-danger);">*</span></label>
+        <input type="text" id="couponDescription" class="form-control" required placeholder="e.g. 20% off on all Serum products">
+      </div>
+
+      <!-- ROW 2: Type + Value -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Discount Type <span style="color:var(--status-danger);">*</span></label>
+          <select class="form-control" id="couponType">
+            <option value="percentage">Percentage (%)</option>
+            <option value="fixed">Fixed Amount (&#3647;)</option>
+            <option value="free_shipping">Free Shipping</option>
+          </select>
+        </div>
+        <div class="form-group" id="discountValueRow">
+          <label>Discount Value <span style="color:var(--status-danger);">*</span></label>
+          <input type="number" id="couponValue" class="form-control" placeholder="e.g. 20" min="0" step="any">
+        </div>
+      </div>
+
+      <!-- ROW 3: Min Spend + Usage Limit -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Min. Spend (&#3647;) <span style="font-size:0.7rem; color:var(--gray);">0 = no minimum</span></label>
+          <input type="number" id="couponMinSpend" class="form-control" value="0" min="0" step="1">
+        </div>
+        <div class="form-group">
+          <label>Usage Limit <span style="font-size:0.7rem; color:var(--gray);">0 = unlimited</span></label>
+          <input type="number" id="couponUsageLimit" class="form-control" value="0" min="0" step="1">
+        </div>
+      </div>
+
+      <!-- Expiry Date -->
+      <div class="form-group">
+        <label>Expiration Date <span style="color:var(--status-danger);">*</span></label>
+        <input type="date" id="couponExpiry" class="form-control" required>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex; justify-content:flex-end; gap: 0.6rem; margin-top: 1.2rem;">
+        <button type="button" class="btn-ghost-sm" onclick="closeModal('modalAddCoupon')">Cancel</button>
+        <button type="submit" class="btn-dark-sm" style="padding: 0.55rem 1.4rem;">Save Coupon</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── TOAST CONTAINER ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── JAVASCRIPT LOGIC ── -->
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/topbar.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/coupons.js"></script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>1. จัดการสินค้า (Product Management) — SkincareShop Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script>if(localStorage.getItem('adminLoggedIn')==='true'||sessionStorage.getItem('adminLoggedIn')==='true')document.documentElement.classList.add('admin-logged-in');</script>
+  <link rel="stylesheet" href="css/admin.css"/>
+</head>
+<body>
+
+<!-- ── AUTH LOGIN OVERLAY ── -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <span class="auth-badge">SkincareShop · Admin Protection</span>
+    <h2 class="auth-title">Admin Authentication</h2>
+    <p class="auth-desc">กรุณาลงชื่อเข้าใช้ด้วยบัญชีผู้ดูแลระบบเพื่อเข้าสู่ระบบจัดการ</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <div class="form-group">
+        <label>Username / Email</label>
+        <input type="text" id="adminUser" class="form-control" value="admin" required placeholder="admin@skincareshop.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" class="form-control" value="password123" required>
+      </div>
+      <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+    </form>
+    <p style="margin-top: 1.2rem; font-size: 0.72rem; color: var(--gray); text-align: center;">
+      Demo Admin Credential: <strong>admin</strong> / <strong>password123</strong>
+    </p>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="admin-container">
+  
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="main-content">
+    
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div>
+        <h1 class="page-title">Products</h1>
+        <p class="page-sub">เพิ่ม แก้ไข ลบ กำหนดราคา และควบคุมสต็อกสินค้าในคลัง</p>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="ค้นหาสินค้า, คำสั่งซื้อ, ลูกค้า..." onkeyup="globalSearch(this.value)">
+        </div>
+
+        <div style="position:relative;">
+          <div class="notif-bell" onclick="toggleNotifDrawer()">
+            🔔 <span class="notif-dot"></span>
+          </div>
+
+          <div class="notif-drawer" id="notifDrawer">
+            <div class="notif-header">
+              <h4>System Alerts (3)</h4>
+              <span style="font-size:0.65rem; color:var(--gray); cursor:pointer;" onclick="clearNotifs()">Mark all read</span>
+            </div>
+            <div class="notif-list">
+              <div class="notif-item">
+                <strong>New Order #ORD-20260722-0001</strong>
+                <p>ยอดชำระ ฿1,500 ผ่าน PromptPay</p>
+                <div class="time">2 นาทีที่แล้ว</div>
+              </div>
+              <div class="notif-item">
+                <strong>Low Stock Alert!</strong>
+                <p>Soothing Centella Cream คงเหลือเพียง 4 ชิ้น</p>
+                <div class="time">15 นาทีที่แล้ว</div>
+              </div>
+              <div class="notif-item">
+                <strong>LINE Notify Webhook Active</strong>
+                <p>ส่งการแจ้งเตือนคำสั่งซื้อไปยังกลุ่ม Admin แล้ว</p>
+                <div class="time">1 ชั่วโมงที่แล้ว</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOP RIGHT USER PROFILE DROPDOWN -->
+        <div class="user-dropdown-wrapper" style="position:relative;">
+          <button class="user-profile-btn" onclick="toggleUserDropdown(event)">
+            <div class="user-avatar">VK</div>
+            <div class="user-details">
+              <span class="user-name">Visada K.</span>
+              <span class="user-role">Super Admin ▼</span>
+            </div>
+          </button>
+          
+          <div class="user-dropdown-menu" id="userDropdown">
+            <div class="dropdown-header">
+              <strong>Visada K.</strong>
+              <p>admin@skincareshop.com</p>
+              <span class="status-badge badge-success" style="margin-top:0.4rem;">Super Administrator</span>
+            </div>
+            <hr style="border:0; border-top:1px solid var(--border); margin:0.5rem 0;"/>
+            <button onclick="showToast('เปิดการตั้งค่าระบบผู้ดูแล')" class="dropdown-item">Settings</button>
+            <button onclick="lockAdminSession()" class="dropdown-item logout">Logout</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- PRODUCT MANAGEMENT CONTENT -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Products</h3>
+        <button class="btn-dark-sm" onclick="openAddProductModal()">+ Add New Product</button>
+      </div>
+
+      <div class="filter-row">
+        <button class="btn-dark-sm" onclick="filterProducts('all')">All Products (9)</button>
+        <button class="btn-ghost-sm" onclick="filterProducts('Serum')">Serum</button>
+        <button class="btn-ghost-sm" onclick="filterProducts('Moisturizer')">Moisturizer</button>
+        <button class="btn-ghost-sm" onclick="filterProducts('Oil')">Oil</button>
+        <button class="btn-ghost-sm" onclick="filterProducts('Cleanser')">Cleanser</button>
+        <button class="btn-ghost-sm" onclick="filterProducts('Mist')">Mist</button>
+        <button class="btn-ghost-sm" onclick="filterProducts('Mask')">Mask</button>
+        <button class="btn-ghost-sm" onclick="filterProducts('Sunscreen')">Sunscreen</button>
+        <button class="btn-ghost-sm" style="color:var(--status-danger);" onclick="filterProducts('low_stock')">Low Stock (<10)</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Image</th>
+              <th>Product Name & Ingredients</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock Qty</th>
+              <th>Expiry Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productTableBody">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── MODAL: ADD PRODUCT ── -->
+<div class="modal-backdrop" id="modalAddProduct">
+  <div class="modal-box" style="max-width: 680px;">
+    <div class="modal-header">
+      <h3 class="modal-title" id="productModalTitle">Add New Product</h3>
+      <button class="modal-close" type="button" onclick="closeModal('modalAddProduct')">✕</button>
+    </div>
+    <form onsubmit="saveNewProduct(event)" id="productForm" enctype="multipart/form-data">
+      <input type="hidden" id="editProdId" value="">
+
+      <!-- IMAGE UPLOAD -->
+      <div class="form-group">
+        <label>Product Image</label>
+        <div id="imgUploadArea" onclick="document.getElementById('newProdImageFile').click()" style="border: 2px dashed var(--border); border-radius: 6px; padding: 1.2rem; text-align: center; cursor: pointer; background: var(--cream); transition: border-color 0.2s;" onmouseover="this.style.borderColor='var(--black)'" onmouseout="this.style.borderColor='var(--border)'">
+          <img id="imgPreview" src="" alt="" style="max-height: 140px; max-width: 100%; object-fit: contain; display: none; margin: 0 auto 0.6rem; border-radius: 4px;" />
+          <div id="imgPlaceholder" style="color: var(--gray); font-size: 0.82rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.3rem;"></div>
+            <div>Click to upload product image</div>
+            <div style="font-size: 0.7rem; margin-top: 0.2rem;">JPG, PNG, WEBP — max 5MB</div>
+          </div>
+        </div>
+        <input type="file" id="newProdImageFile" accept="image/*" style="display:none;" onchange="previewProductImage(this)">
+      </div>
+
+      <!-- ROW 1: Name + Brand -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Product Name <span style="color:var(--status-danger);">*</span></label>
+          <input type="text" id="newProdName" class="form-control" required placeholder="e.g. Hydrating Serum 30ml">
+        </div>
+        <div class="form-group">
+          <label>Brand</label>
+          <input type="text" id="newProdBrand" class="form-control" placeholder="e.g. GLOWTIME" value="GLOWTIME">
+        </div>
+      </div>
+
+      <!-- ROW 2: Category + Price -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Category <span style="color:var(--status-danger);">*</span></label>
+          <select class="form-control" id="newProdCat">
+            <option value="Serum">Serum</option>
+            <option value="Moisturizer">Moisturizer</option>
+            <option value="Cleanser">Cleanser</option>
+            <option value="Sunscreen">Sunscreen</option>
+            <option value="Oil">Oil</option>
+            <option value="Mist">Mist</option>
+            <option value="Mask">Mask</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Price (฿) <span style="color:var(--status-danger);">*</span></label>
+          <input type="number" id="newProdPrice" class="form-control" required placeholder="590" min="0" step="1">
+        </div>
+      </div>
+
+      <!-- ROW 3: Stock Qty + Expiry Date -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-group">
+          <label>Stock Qty <span style="color:var(--status-danger);">*</span></label>
+          <input type="number" id="newProdStock" class="form-control" required placeholder="100" min="0">
+        </div>
+        <div class="form-group">
+          <label>Expiry Date</label>
+          <input type="date" id="newProdExpiry" class="form-control" value="2027-12-31">
+        </div>
+      </div>
+
+      <!-- ROW 4: Key Ingredients -->
+      <div class="form-group">
+        <label>Key Ingredients <span style="font-size:0.7rem; color:var(--gray);">(comma separated)</span></label>
+        <input type="text" id="newProdIngredients" class="form-control" placeholder="e.g. Hyaluronic Acid, Niacinamide, Vitamin C">
+      </div>
+
+      <!-- ROW 5: Description -->
+      <div class="form-group">
+        <label>Product Description</label>
+        <textarea id="newProdDesc" class="form-control" rows="2" placeholder="Briefly describe the product benefits..."></textarea>
+      </div>
+
+      <!-- ACTIONS -->
+      <div style="display:flex; justify-content:flex-end; gap: 0.6rem; margin-top: 1.2rem;">
+        <button type="button" class="btn-ghost-sm" onclick="closeModal('modalAddProduct')">Cancel</button>
+        <button type="submit" class="btn-dark-sm" style="padding: 0.55rem 1.4rem;">Save Product</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- ── TOAST CONTAINER ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── JAVASCRIPT LOGIC ── -->
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/topbar.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/products.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Promotions &amp; Bundles — GLOWTIME Staff &amp; Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script>if(localStorage.getItem('adminLoggedIn')==='true'||sessionStorage.getItem('adminLoggedIn')==='true')document.documentElement.classList.add('admin-logged-in');</script>
+  <link rel="stylesheet" href="css/admin.css"/>
+</head>
+<body>
+
+<!-- ── AUTH LOCK OVERLAY ── -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <span class="auth-badge">SkincareShop · Admin Protection</span>
+    <h2 class="auth-title">Admin Authentication</h2>
+    <p class="auth-desc">Please sign in to access the admin system</p>
+    <form onsubmit="handleAdminLogin(event)">
+      <div class="form-group">
+        <label>Username / Email</label>
+        <input type="text" id="adminUser" class="form-control" value="admin" required placeholder="admin@skincareshop.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" class="form-control" value="password123" required>
+      </div>
+      <button type="submit" class="btn-submit">Sign In to Dashboard</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── MAIN LAYOUT ── -->
+<div class="admin-container">
+
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main-content">
+    <header class="topbar" data-title="Promotions &amp; Bundles" data-sub="Bundle sets, flash sale campaigns, and cart recovery alerts"></header>
+
+    <!-- BUNDLE SETS -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Bundle Sets</h3>
+        <button class="btn-dark-sm" onclick="showToast('Opening Create Bundle form...')">+ Create Bundle</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Bundle Name</th>
+              <th>Included Products</th>
+              <th>Regular Price</th>
+              <th>Bundle Price</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Calming Duo Set</strong></td>
+              <td>Hyaluronic Serum (30ml) + Barrier Repair Cream (50g)</td>
+              <td>฿1,270</td>
+              <td><strong style="color:var(--status-success);">฿990 (save ฿280)</strong></td>
+              <td><span class="status-badge badge-success">Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CART RECOVERY TRIGGER -->
+    <div class="content-card">
+      <div class="card-header">
+        <h3 class="card-title">Cart Recovery Trigger</h3>
+        <button class="btn-dark-sm" onclick="showToast('Push alert sent to 14 customers with abandoned carts!')">Send Push Alert</button>
+      </div>
+      <p style="font-size:0.85rem; color:#777; padding: 0 0 0.5rem;">
+        <strong>14 customers</strong> have had items in their cart for over 2 hours (total pending value: <strong>฿18,200</strong>)
+      </p>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/topbar.js"></script>
+<script src="js/sidebar.js"></script>
+</body>
+</html>

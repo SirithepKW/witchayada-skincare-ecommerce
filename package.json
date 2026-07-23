@@ -1,0 +1,21 @@
+{
+  "name": "glowtime-skincare-ecommerce",
+  "version": "1.0.0",
+  "description": "GLOWTIME — Skincare E-Commerce Suite (Customer & Staff Admin Portal)",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx -y serve -p 3000",
+    "dev": "npx -y serve -p 3000",
+    "admin": "npx -y serve staff-manager/frontend -p 8080",
+    "customer": "npx -y serve customer/frontend -p 3000",
+    "backend": "npm --prefix customer/backend start"
+  },
+  "keywords": [
+    "skincare",
+    "ecommerce",
+    "glowtime",
+    "admin"
+  ],
+  "author": "GLOWTIME Team",
+  "license": "ISC"
+}
