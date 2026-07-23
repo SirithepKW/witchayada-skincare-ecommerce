@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Environment variables — ห้าม commit credentials
+.env
+.env.local
+.env.production
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

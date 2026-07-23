@@ -81,7 +81,7 @@ app.get('/api/health', (_req, res) => {
     status: 'ok',
     service: 'GLOWTIME Customer Backend',
     version: '1.0.0',
-    dataMode: 'Mock JSON (in-memory)',
+    dataMode: 'Railway MySQL (Live DB)',
     timestamp: new Date().toISOString(),
   });
 });
@@ -94,18 +94,9 @@ app.use('/api/orders',   orderRouter);
 app.use('/api/payments', paymentRouter);
 app.use('/api/reviews',  reviewRouter);
 
-// ── Serve Customer Frontend (static) ───────────────────────
-// เปิด http://localhost:5000/ ได้เลย
-app.use(express.static(require('path').join(__dirname, '../../frontend')));
-
 // ── 404 Handler (API routes only) ──────────────────────────
 app.use('/api', (_req, res) => {
   res.status(404).json({ success: false, message: 'API route not found' });
-});
-
-// ── Fallback: serve frontend for all non-API routes ─────────
-app.get('*', (_req, res) => {
-  res.sendFile(require('path').join(__dirname, '../../frontend/index.html'));
 });
 
 

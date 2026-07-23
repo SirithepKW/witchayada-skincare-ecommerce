@@ -47,7 +47,7 @@ const login = async (req, res, next) => {
  */
 const getProfile = async (req, res, next) => {
   try {
-    const profile = authService.getProfile(req.user.userId);
+    const profile = await authService.getProfile(req.user.userId);
     res.json({ success: true, data: profile });
   } catch (err) {
     next(err);

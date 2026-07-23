@@ -1,4 +1,4 @@
-const { findOne, create, update } = require('../../config/store');
+const { pool } = require('../../config/store');
 
 const PAYMENT_METHODS = ['credit_card', 'qr_code', 'bank_transfer', 'cash_on_delivery'];
 
@@ -6,54 +6,66 @@ const PAYMENT_METHODS = ['credit_card', 'qr_code', 'bank_transfer', 'cash_on_del
  * จำลองการชำระเงิน (Simulation)
  * — ตรวจสอบ order → สร้าง payment → อัปเดต status order เป็น confirmed
  */
-const checkout = (customerId, { orderId, method }) => {
+const checkout = async (customerId, { orderId, method }) => {
   if (!PAYMENT_METHODS.includes(method)) {
     const err = new Error(`วิธีชำระเงินไม่ถูกต้อง: ${PAYMENT_METHODS.join(', ')}`);
     err.statusCode = 400;
     throw err;
   }
 
-  const order = findOne('orders', (o) => o.orderId === orderId && o.customerId === customerId);
+  // orderId จาก frontend อาจเป็น "ORD-20250101-0001" หรือ numeric
+  const numericId = Number(orderId);
+
+  const [[order]] = await pool.query(
+    `SELECT order_id, customer_id, status, total_amount
+     FROM orders WHERE order_id = ? AND customer_id = ?`,
+    [numericId, customerId]
+  );
   if (!order) {
-    const err = new Error('ไม่พบคำสั่งซื้อ');
-    err.statusCode = 404;
-    throw err;
+    const err = new Error('ไม่พบคำสั่งซื้อ'); err.statusCode = 404; throw err;
   }
   if (order.status !== 'pending_payment') {
     const err = new Error(`ชำระเงินไม่ได้ (สถานะปัจจุบัน: ${order.status})`);
-    err.statusCode = 400;
-    throw err;
+    err.statusCode = 400; throw err;
   }
 
-  // เก็บเงินปลายทาง: ไม่ต้องมี payment record, แค่ยืนยัน order
+  // เก็บเงินปลายทาง: ไม่ต้องมี payment record ใน DB, แค่ยืนยัน order
   if (method === 'cash_on_delivery') {
-    update('orders', order.id, { status: 'confirmed', paymentMethod: 'cash_on_delivery' });
+    await pool.query(
+      'UPDATE orders SET status = "confirmed", payment_method = "cash_on_delivery" WHERE order_id = ?',
+      [numericId]
+    );
     return {
       paymentId: null,
       orderId,
       method: 'cash_on_delivery',
       status: 'pending_cod',
-      amount: order.totalAmount,
+      amount: Number(order.total_amount),
       note: 'ชำระเงินเมื่อได้รับสินค้า',
     };
   }
 
-  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-  const paymentId = `PAY-${dateStr}-${String(Date.now()).slice(-4)}`;
+  // สร้าง payment record
+  const [payResult] = await pool.query(
+    'INSERT INTO payments (order_id, method, status, amount) VALUES (?, ?, "Paid", ?)',
+    [numericId, method, order.total_amount]
+  );
+  const paymentId = payResult.insertId;
 
-  const payment = create('payments', {
+  // อัปเดตสถานะ order → confirmed
+  await pool.query(
+    'UPDATE orders SET status = "confirmed" WHERE order_id = ?',
+    [numericId]
+  );
+
+  return {
     paymentId,
     orderId,
     method,
-    status: 'success',   // Simulation: always success
-    amount: order.totalAmount,
+    status: 'success',
+    amount: Number(order.total_amount),
     paidAt: new Date().toISOString(),
-  });
-
-  // อัปเดตสถานะ order → confirmed
-  update('orders', order.id, { status: 'confirmed' });
-
-  return payment;
+  };
 };
 
 module.exports = { checkout, PAYMENT_METHODS };

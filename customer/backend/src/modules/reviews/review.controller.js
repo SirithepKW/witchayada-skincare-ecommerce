@@ -3,9 +3,9 @@ const reviewService = require('./review.service');
 /**
  * GET /api/reviews/:productId
  */
-const getReviews = (req, res, next) => {
+const getReviews = async (req, res, next) => {
   try {
-    const reviews = reviewService.getReviewsByProduct(req.params.productId);
+    const reviews = await reviewService.getReviewsByProduct(req.params.productId);
     res.json({ success: true, count: reviews.length, data: reviews });
   } catch (err) { next(err); }
 };
@@ -14,7 +14,7 @@ const getReviews = (req, res, next) => {
  * POST /api/reviews
  * body: { productId, orderId (optional), rating, comment }
  */
-const createReview = (req, res, next) => {
+const createReview = async (req, res, next) => {
   try {
     const { productId, orderId, rating, comment } = req.body;
     if (!productId || !rating || !comment) {
@@ -23,7 +23,7 @@ const createReview = (req, res, next) => {
         message: 'กรุณาระบุ productId, rating และ comment',
       });
     }
-    const review = reviewService.createReview(req.user.userId, { productId, orderId, rating, comment });
+    const review = await reviewService.createReview(req.user.customerId, { productId, orderId, rating, comment });
     res.status(201).json({ success: true, data: review });
   } catch (err) { next(err); }
 };

@@ -2,11 +2,11 @@
  * GLOWTIME — Customer Frontend API Client
  * ─────────────────────────────────────────────────────
  * Wrapper รอบ fetch() เพื่อเชื่อมกับ Customer Backend
- * Base URL: http://localhost:5000
+ * Base URL: https://witchayada-skincare-ecommerce.vercel.app
  * ─────────────────────────────────────────────────────
  */
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = 'https://witchayada-skincare-ecommerce.vercel.app';
 
 // ── Token helpers ──────────────────────────────────────
 const getToken = () => localStorage.getItem('glowtime_token');
