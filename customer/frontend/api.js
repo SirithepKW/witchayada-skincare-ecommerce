@@ -199,27 +199,53 @@ const Cart = {
 };
 
 // ── Orders ─────────────────────────────────────────────
+/**
+ * แปลงข้อมูลออเดอร์จาก backend (MySQL) ให้ตรงกับที่หน้าเว็บใช้
+ * — รายการรวม (getMyOrders) ไม่ส่ง items มา → กัน o.items.map พัง
+ * — สถานะจาก seed เก่าเป็นตัวใหญ่ ("Confirmed") → แปลงเป็นตัวเล็กให้ timeline จับได้
+ */
+function normalizeOrder(o) {
+  if (!o) return o;
+  let status = String(o.status || '').toLowerCase();
+  if (status === 'pending') status = 'pending_payment';
+  return {
+    ...o,
+    status,
+    items: Array.isArray(o.items) ? o.items : [],
+    totalAmount: Number(o.totalAmount) || 0,
+  };
+}
+
 const Orders = {
   async create(shippingAddress, paymentMethod) {
     const res = await apiFetch('/api/orders', {
       method: 'POST',
       body: JSON.stringify({ shippingAddress, paymentMethod }),
     });
-    return res.data;
+    return normalizeOrder(res.data);
   },
 
   async list() {
     const res = await apiFetch('/api/orders');
-    return res.data;
+    const orders = (res.data || []).map(normalizeOrder);
+    // backend ส่งรายการรวมมาโดยไม่มี items → ดึงรายละเอียดมาเติมทีละออเดอร์
+    await Promise.all(orders.map(async (o) => {
+      if (o.items.length) return;
+      try {
+        const full = await Orders.get(o.orderId);
+        o.items = Array.isArray(full.items) ? full.items : [];
+      } catch { /* เติมไม่ได้ก็แสดงการ์ดแบบไม่มีรายการสินค้า */ }
+    }));
+    return orders;
   },
 
   async get(orderId) {
-    const res = await apiFetch(`/api/orders/${orderId}`);
-    return res.data;
+    const res = await apiFetch(`/api/orders/${dbOrderId(orderId)}`);
+    return normalizeOrder(res.data);
   },
 
   async confirmReceive(orderId) {
-    const res = await apiFetch(`/api/orders/${orderId}/receive`, { method: 'PUT' });
+    const res = await apiFetch(`/api/orders/${dbOrderId(orderId)}/receive`, { method: 'PUT' });
     return res.data;
   },
 };
@@ -241,11 +267,24 @@ const Reviews = {
 };
 
 // ── Payments ───────────────────────────────────────────
+/**
+ * แปลงเลขออเดอร์ให้เป็นตัวเลขที่ backend (MySQL) ใช้ได้
+ * — backend คืนเลขสวยงาม "ORD-20260724-0005" แต่ตอนรับกลับต้องการเลขจริง (5)
+ * — กันบัค Number("ORD-...") = NaN ที่ทำให้ชำระเงินพัง (500)
+ */
+function dbOrderId(orderId) {
+  if (typeof orderId === 'number') return orderId;
+  const s = String(orderId || '');
+  if (/^\d+$/.test(s)) return Number(s);
+  const m = /-(\d+)$/.exec(s);          // "ORD-20260724-0005" → "0005" → 5
+  return m ? Number(m[1]) : orderId;
+}
+
 const Payments = {
   async checkout(orderId, method) {
     const res = await apiFetch('/api/payments/checkout', {
       method: 'POST',
-      body: JSON.stringify({ orderId, method }),
+      body: JSON.stringify({ orderId: dbOrderId(orderId), method }),
     });
     return res.data;
   },
