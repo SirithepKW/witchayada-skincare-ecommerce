@@ -300,6 +300,14 @@
       </button>
       <!-- CTA -->
       <div class="pdp-cta">
+        <div class="pdp-qty-wrap">
+          <span class="pdp-section-label" style="margin:0;">จำนวน</span>
+          <div class="pdp-qty-ctrl">
+            <button type="button" class="pdp-qty-btn" onclick="changePdpQty(-1)">−</button>
+            <input type="number" id="pdpQtyInput" class="pdp-qty-val" value="1" min="1" max="99" readonly />
+            <button type="button" class="pdp-qty-btn" onclick="changePdpQty(1)">+</button>
+          </div>
+        </div>
         <button class="pdp-btn-add" id="pdpAddBtn" onclick="pdpAddToCart()">Add to Cart</button>
         <p class="pdp-guest-note" id="pdpGuestNote" style="display:none;">
           สินค้าถูกบันทึกไว้ชั่วคราว —

@@ -32,11 +32,25 @@ const GuestCart = {
   _key: 'glowtime_guest_cart',
   get() { try { return JSON.parse(localStorage.getItem(this._key)) || []; } catch { return []; } },
   save(items) { localStorage.setItem(this._key, JSON.stringify(items)); },
-  add(product) {
+  add(product, qty = 1) {
     const items = this.get();
     const existing = items.find(i => i.id === product.id);
-    if (existing) { existing.qty += 1; }
-    else { items.push({ id: product.id, name: product.name, price: product.price, qty: 1 }); }
+    if (existing) { existing.qty += qty; }
+    else { items.push({ id: product.id, name: product.name, price: product.price, qty: qty }); }
+    this.save(items);
+  },
+  update(productId, qty) {
+    let items = this.get();
+    if (qty <= 0) {
+      items = items.filter(i => i.id !== productId);
+    } else {
+      const existing = items.find(i => i.id === productId);
+      if (existing) existing.qty = qty;
+    }
+    this.save(items);
+  },
+  remove(productId) {
+    const items = this.get().filter(i => i.id !== productId);
     this.save(items);
   },
   count() { return this.get().reduce((s, i) => s + i.qty, 0); },

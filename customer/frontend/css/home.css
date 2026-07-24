@@ -128,14 +128,26 @@
 
 /* ── CART MODAL ──────────────────────────── */
 .cart-modal { max-width: 520px; }
-.cart-items-list { max-height: 320px; overflow-y: auto; margin: 1rem 0; }
-.cart-row { display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+.cart-items-list { max-height: 340px; overflow-y: auto; margin: 1rem 0; }
+.cart-row { display: grid; grid-template-columns: 1fr auto auto auto; gap: 0.8rem; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
 .cart-row-name { font-family: var(--serif); font-size: 0.95rem; }
 .cart-row-meta { font-size: 0.72rem; color: var(--gray); }
-.cart-row-qty { font-size: 0.8rem; color: var(--gray); }
-.cart-row-price { font-size: 0.85rem; }
+.cart-qty-ctrl { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 3px; background: #fff; }
+.cart-qty-btn { background: none; border: none; width: 26px; height: 26px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--black); transition: background 0.15s; }
+.cart-qty-btn:hover { background: var(--cream); }
+.cart-qty-val { width: 30px; text-align: center; font-size: 0.8rem; font-weight: 500; }
+.cart-row-price { font-size: 0.85rem; font-weight: 500; min-width: 60px; text-align: right; }
+.cart-remove-btn { background: none; border: none; color: #999; cursor: pointer; font-size: 1.1rem; padding: 0 0.3rem; transition: color 0.15s; line-height: 1; }
+.cart-remove-btn:hover { color: #8B3A3A; }
 .cart-total { display: flex; justify-content: space-between; padding: 1rem 0; font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 0.5rem; }
 .cart-total strong { font-family: var(--serif); font-size: 1.1rem; }
+
+/* ── PDP Quantity Selector ── */
+.pdp-qty-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem; padding: 0.4rem 0; }
+.pdp-qty-ctrl { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 3px; background: #fff; }
+.pdp-qty-btn { background: none; border: none; width: 34px; height: 34px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--black); transition: background 0.15s; }
+.pdp-qty-btn:hover { background: var(--cream); }
+.pdp-qty-val { width: 40px; border: none; text-align: center; font-size: 0.9rem; font-weight: 500; background: transparent; outline: none; }
 
 /* ── PRODUCT DETAIL MODAL (PDP) ──────────── */
 .pdp-modal {
