@@ -110,7 +110,7 @@
           
           <div style="display:flex; align-items:center; gap: 1.5rem; margin-bottom: 2rem;">
             <div id="avatarPreview" style="width: 80px; height: 80px; border-radius: 50%; background: var(--dark); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 600; overflow: hidden; background-size: cover; background-position: center;">
-              <span id="avatarInitials">VK</span>
+              <span id="avatarInitials">?</span>
             </div>
             <div>
               <input type="file" id="avatarUpload" accept="image/*" style="display:none;" onchange="previewAvatar(this)">
@@ -119,29 +119,30 @@
             </div>
           </div>
           
-          <form onsubmit="event.preventDefault(); showToast('Profile updated successfully');">
+          <form id="profileForm" onsubmit="saveProfileChanges(event)">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
               <div class="form-group">
-                <label>First Name</label>
-                <input type="text" class="form-control" value="Visada">
+                <label>Username</label>
+                <input type="text" id="profileUsername" class="form-control" placeholder="username" value="-">
               </div>
               <div class="form-group">
-                <label>Last Name</label>
-                <input type="text" class="form-control" value="K.">
+                <label>Role</label>
+                <input type="text" id="profileRole" class="form-control" value="-" disabled style="background: var(--cream);">
               </div>
             </div>
             
             <div class="form-group">
               <label>Email Address</label>
-              <input type="email" class="form-control" value="admin@skincareshop.com">
+              <input type="email" id="profileEmail" class="form-control" value="-" disabled style="background: var(--cream);">
             </div>
-            
+
             <div class="form-group">
-              <label>Role</label>
-              <input type="text" class="form-control" value="Super Administrator" disabled style="background: var(--cream);">
+              <label>Position</label>
+              <input type="text" id="profilePosition" class="form-control" placeholder="e.g. warehouse" value="-">
             </div>
             
-            <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+            <div style="margin-top: 2rem; display: flex; justify-content: flex-end; align-items: center; gap: 1rem;">
+              <span id="profileSaveStatus" style="font-size:0.8rem; color:var(--gray);"></span>
               <button type="submit" class="btn-dark-sm">Save Changes</button>
             </div>
           </form>
@@ -287,5 +288,66 @@
 <script src="js/shared.js"></script>
 <script src="js/topbar.js"></script>
 <script src="js/sidebar.js"></script>
+<script>
+  // ── Load Profile from Backend ─────────────────────────────────────
+  async function loadProfileFromBackend() {
+    // ลองดึงจาก backend ก่อน (ต้อง login และมี token)
+    let profile = null;
+    if (window.GlowtimeAdminAPI) {
+      profile = await window.GlowtimeAdminAPI.Auth.getProfile();
+    }
+
+    // Fallback: ใช้ข้อมูลจาก localStorage (ที่เก็บไว้ตอน login)
+    if (!profile) {
+      try { profile = JSON.parse(localStorage.getItem('glowtime_user')); } catch {}
+    }
+    if (!profile) {
+      // ถ้ายังไม่มี fallback ไปใช้ glowtime_current_admin
+      try { profile = JSON.parse(localStorage.getItem('glowtime_current_admin')); } catch {}
+    }
+
+    if (!profile) return;
+
+    // เติมข้อมูลลงฟอร์ม
+    const usernameEl  = document.getElementById('profileUsername');
+    const emailEl     = document.getElementById('profileEmail');
+    const roleEl      = document.getElementById('profileRole');
+    const positionEl  = document.getElementById('profilePosition');
+    const initialsEl  = document.getElementById('avatarInitials');
+
+    const username  = profile.username || profile.name || '';
+    const email     = profile.email || '';
+    const role      = profile.role || profile.roleTitle || '';
+    const position  = profile.position || '';
+
+    if (usernameEl)  usernameEl.value  = username;
+    if (emailEl)     emailEl.value     = email;
+    if (roleEl)      roleEl.value      = role.charAt(0).toUpperCase() + role.slice(1);
+    if (positionEl)  positionEl.value  = position || '-';
+
+    // Avatar initials — ใช้ 2 ตัวแรกของ username
+    if (initialsEl) {
+      const initials = username
+        ? username.substring(0, 2).toUpperCase()
+        : email.substring(0, 2).toUpperCase();
+      initialsEl.textContent = initials;
+    }
+  }
+
+  // ── Save Profile Changes ─────────────────────────────────────────
+  async function saveProfileChanges(e) {
+    e.preventDefault();
+    const statusEl = document.getElementById('profileSaveStatus');
+    if (statusEl) statusEl.textContent = 'Saving...';
+
+    // เอาไว้เฝืออนาคต (เมื่อ Backend รองรับ PATCH /api/auth/profile)
+    showToast('บันทึกข้อมูลสำเร็จ');
+    if (statusEl) statusEl.textContent = '✓ Saved';
+    setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 3000);
+  }
+
+  // เรียกหลังจากโหลด scripts เสร็จ
+  window.addEventListener('load', loadProfileFromBackend);
+</script>
 </body>
 </html>

@@ -1,18 +1,12 @@
 /**
  * GLOWTIME — Staff & Admin Order Management Logic (js/orders.js)
  * ─────────────────────────────────────────────────────────────
-
  * ระบบจัดการคำสั่งซื้อ การอนุมัติสลิปโอนเงิน และการอัปเดตสถานะการจัดส่ง
  * เชื่อมต่อกับ backend จริงผ่าน GlowtimeAdminAPI
-
- * ระบบจัดการคำสั่งซื้อ การอนุมัติสลิปโอนเงินเฉพาะสเตตัส "รอการชำระเงิน (pending_payment)"
- * และการอัปเดตสเตตัสการจัดส่งที่สอดคล้องกับลอจิสติกส์จริง
-
  * ─────────────────────────────────────────────────────────────
  */
 
 let activeSelectedOrderId = null;
-
 let currentFilterStatus = 'all'; // track active filter
 
 // ── Mock data (ตรงกับ backend orders.json) ──────────────────────
@@ -79,57 +73,6 @@ let ordersList = [
     shippingAddress: { recipient: "เจน ผิวมัน", phone: "089-876-5432", address: "88 ถ.เพชรบุรี", province: "กรุงเทพมหานคร", postalCode: "10400" },
     approvedAt: "2026-07-05T12:00:00+07:00",
     createdAt: "2026-07-05T11:20:00+07:00"
-
-
-let ordersList = [
-  { 
-    id: 1, 
-    orderId: "ORD-20260722-0001", 
-    customerId: 1, 
-    status: "pending_payment", 
-    paymentMethod: "PromptPay QR Code",
-    slipRef: "SLIP-20260722-9988 (K-Bank)",
-    items: [
-      { orderItemId: 1, productId: 1001, productName: "Hydrating Serum 30ml", qty: 2, unitPrice: 590.00, subtotal: 1180.00 },
-      { orderItemId: 2, productId: 1007, productName: "Daily SPF 50+ Sunscreen", qty: 1, unitPrice: 490.00, subtotal: 490.00 }
-    ], 
-    totalAmount: 1670.00, 
-    shippingAddress: { recipient: "คุณศิรินทร์ภา วงศ์อุบล", phone: "081-234-5678", address: "123/45 ถนนสุขุมวิท เขตคลองเตย", province: "กรุงเทพมหานคร", postalCode: "10110" }, 
-    createdAt: "2026-07-22T20:45:00+07:00" 
-  },
-  { 
-    id: 2, 
-    orderId: "ORD-20260722-0002", 
-    customerId: 2, 
-    status: "confirmed", 
-    paymentMethod: "Credit Card (VISA *** 4921)",
-    slipRef: "TXN-20260722-4921",
-    approvedAt: "22 ก.ค. 2026 18:30 น.",
-    items: [
-      { orderItemId: 1, productId: 1002, productName: "Renewal Cream 50g", qty: 1, unitPrice: 890.00, subtotal: 890.00 }
-    ], 
-    totalAmount: 890.00, 
-    shippingAddress: { recipient: "คุณภัทรพงศ์ อนันต์", phone: "089-876-5432", address: "88/12 ถนนแจ้งวัฒนะ", province: "นนทบุรี", postalCode: "11000" }, 
-    createdAt: "2026-07-22T18:12:00+07:00" 
-  },
-  { 
-    id: 3, 
-    orderId: "ORD-20260701-0001", 
-    customerId: 3, 
-    status: "delivered", 
-    paymentMethod: "PromptPay QR Code",
-    slipRef: "SLIP-20260701-1122",
-    approvedAt: "01 ก.ค. 2026 10:30 น.",
-    trackingNo: "KRY-98765432-TH (Kerry Express)",
-    deliveredAt: "03 ก.ค. 2026 14:15 น.",
-    signedBy: "คุณณัฐณิชา กิตติช่วง",
-    items: [
-      { orderItemId: 1, productId: 1001, productName: "Hydrating Serum 30ml", qty: 1, unitPrice: 590.00, subtotal: 590.00 }
-    ], 
-    totalAmount: 590.00, 
-    shippingAddress: { recipient: "คุณณัฐณิชา กิตติช่วง", phone: "086-555-1234", address: "99/5 ถนนนิมมานเหมินท์ อ.เมือง", province: "เชียงใหม่", postalCode: "50200" }, 
-    createdAt: "2026-07-01T10:15:00+07:00" 
-
   }
 ];
 
@@ -145,7 +88,6 @@ const statusBadgeMap = {
   'completed':       '<span class="status-badge badge-success">Delivered</span>',
   'cancelled':       '<span class="status-badge badge-danger">Cancelled</span>'
 };
-
 
 // ── Load Orders from Backend ──────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -188,28 +130,14 @@ function updateCounters() {
 }
 
 // ── Render Table ──────────────────────────────────────────────
-
-document.addEventListener('DOMContentLoaded', async () => {
-  if (window.GlowtimeAdminAPI) {
-    const apiOrders = await window.GlowtimeAdminAPI.Orders.list();
-    if (apiOrders && apiOrders.length > 0) {
-      ordersList = apiOrders;
-    }
-  }
-  renderOrderTable(ordersList);
-});
-
-
 function renderOrderTable(items) {
   const tbody = document.getElementById('orderTableBody');
   if (!tbody) return;
-
 
   if (!items || items.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--gray); padding:2rem;">ไม่มีรายการในสถานะนี้</td></tr>`;
     return;
   }
-
 
   tbody.innerHTML = items.map(o => `
     <tr>
@@ -232,7 +160,6 @@ function renderOrderTable(items) {
     </tr>
   `).join('');
 }
-
 
 // ── Filter ────────────────────────────────────────────────────
 function filterOrders(status) {
@@ -268,13 +195,6 @@ function capitalize(s) {
 }
 
 // ── Order Detail Modal ────────────────────────────────────────
-
-function filterOrders(status) {
-  if (status === 'all') renderOrderTable(ordersList);
-  else renderOrderTable(ordersList.filter(o => o.status === status));
-}
-
-
 function openOrderDetail(ordId) {
   activeSelectedOrderId = ordId;
   const ord = ordersList.find(o => o.orderId === ordId);
@@ -292,11 +212,7 @@ function openOrderDetail(ordId) {
       <div style="background:var(--cream); padding:1rem; border:1px solid var(--border); border-radius:4px; margin-bottom:1rem;">
         <h4 style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); margin-bottom:0.4rem;">Customer & Shipping Address</h4>
         <p style="font-size:0.95rem; margin-bottom:0.2rem;"><strong>${ord.shippingAddress?.recipient || 'Customer'}</strong></p>
-
         <p style="font-size:0.8rem; color:var(--gray); margin-bottom:0.4rem;">${ord.shippingAddress?.phone || '-'}</p>
-
-        <p style="font-size:0.8rem; color:var(--gray); margin-bottom:0.4rem;">${ord.shippingAddress?.phone || '081-XXX-XXXX'}</p>
-
         <p style="font-size:0.82rem; color:var(--black); line-height:1.4;">${ord.shippingAddress?.address || ''} ${ord.shippingAddress?.province || ''} ${ord.shippingAddress?.postalCode || ''}</p>
       </div>
 
@@ -321,19 +237,12 @@ function openOrderDetail(ordId) {
   // 2. Render Dynamic Payment & Fulfillment Actions
   if (actionContainer) {
     if (ord.status === 'pending_payment' || ord.status === 'pending') {
-
-      // ONLY SHOW PAYMENT SLIP VERIFICATION & APPROVAL BUTTONS FOR PENDING PAYMENT!
-
       actionContainer.innerHTML = `
         <div style="background:var(--cream); padding:1rem; border:1px solid var(--border); border-radius:4px; height:100%;">
           <h4 style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); margin-bottom:0.4rem;">Payment Slip Verification</h4>
           <div style="text-align:center; padding:1.2rem; background:#fff; border:1px dashed var(--border); border-radius:4px;">
             <div style="font-size:0.85rem; font-weight:bold; color:var(--black); margin-bottom:0.2rem;">${ord.paymentMethod || 'PromptPay QR Code'}</div>
-
             <div style="font-size:0.72rem; color:var(--gray); margin-bottom:0.6rem;">Ref ID: ${ord.slipRef || '-'}</div>
-
-            <div style="font-size:0.72rem; color:var(--gray); margin-bottom:0.6rem;">Ref ID: ${ord.slipRef || 'SLIP-20260722-9988'}</div>
-
             <div style="display:inline-block; padding:0.4rem 0.8rem; background:rgba(197, 160, 89, 0.15); color:#8B6F5E; font-weight:bold; font-size:0.85rem; border-radius:2px; margin-bottom:0.8rem;">
               Pending Payment: ฿${Number(ord.totalAmount).toLocaleString()}
             </div>
@@ -346,9 +255,6 @@ function openOrderDetail(ordId) {
         </div>
       `;
     } else if (ord.status === 'confirmed' || ord.status === 'paid' || ord.status === 'processing') {
-
-      // CONFIRMED / READY FOR PACKING
-
       actionContainer.innerHTML = `
         <div style="background:var(--cream); padding:1rem; border:1px solid var(--border); border-radius:4px; height:100%;">
           <h4 style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); margin-bottom:0.4rem;">Payment Confirmed & Fulfillment</h4>
@@ -357,7 +263,7 @@ function openOrderDetail(ordId) {
               <span class="status-badge badge-success">Payment Approved</span>
             </div>
             <p style="font-size:0.8rem; color:var(--black); margin-bottom:0.4rem;">Method: <strong>${ord.paymentMethod || 'PromptPay QR'}</strong></p>
-            <p style="font-size:0.75rem; color:var(--gray); margin-bottom:0.8rem;">Approved at: ${ord.approvedAt || '22 Jul 2026 18:30'}</p>
+            <p style="font-size:0.75rem; color:var(--gray); margin-bottom:0.8rem;">Approved at: ${formatDateTime(ord.approvedAt)}</p>
             <div style="background:rgba(74, 103, 65, 0.08); padding:0.8rem; border-radius:4px; margin-bottom:1rem; font-size:0.8rem; color:#4A6741;">
               <strong>Status:</strong> Payment confirmed — packing in progress.
             </div>
@@ -366,7 +272,6 @@ function openOrderDetail(ordId) {
         </div>
       `;
     } else if (ord.status === 'shipping' || ord.status === 'shipped') {
-      // SHIPPING IN TRANSIT
       actionContainer.innerHTML = `
         <div style="background:var(--cream); padding:1rem; border:1px solid var(--border); border-radius:4px; height:100%;">
           <h4 style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); margin-bottom:0.4rem;">Shipment Details</h4>
@@ -374,14 +279,13 @@ function openOrderDetail(ordId) {
             <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.6rem;">
               <span class="status-badge badge-info">Shipping</span>
             </div>
-            <p style="font-size:0.82rem; margin-bottom:0.4rem;"><strong>Tracking No.:</strong> <span style="color:#8B6F5E; font-weight:bold;">${ord.trackingNo || 'KRY-98765432-TH (Kerry Express)'}</span></p>
+            <p style="font-size:0.82rem; margin-bottom:0.4rem;"><strong>Tracking No.:</strong> <span style="color:#8B6F5E; font-weight:bold;">${ord.trackingNo || '-'}</span></p>
             <p style="font-size:0.75rem; color:var(--gray); margin-bottom:1rem;">Parcel has been handed to carrier — estimated delivery within 24h.</p>
             <button class="btn-dark-sm" style="width:100%; justify-content:center;" onclick="markDelivered('${ord.orderId}')">Mark as Delivered</button>
           </div>
         </div>
       `;
     } else if (ord.status === 'delivered' || ord.status === 'completed') {
-      // DELIVERED / COMPLETED
       actionContainer.innerHTML = `
         <div style="background:var(--cream); padding:1rem; border:1px solid var(--border); border-radius:4px; height:100%;">
           <h4 style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); margin-bottom:0.4rem;">Delivery Summary</h4>
@@ -390,8 +294,8 @@ function openOrderDetail(ordId) {
               <span class="status-badge badge-success">Delivered</span>
             </div>
             <p style="font-size:0.8rem; margin-bottom:0.3rem;"><strong>Received by:</strong> ${ord.signedBy || ord.shippingAddress?.recipient || '-'}</p>
-            <p style="font-size:0.8rem; margin-bottom:0.3rem;"><strong>Delivered at:</strong> ${ord.deliveredAt || '03 Jul 2026 14:15'}</p>
-            <p style="font-size:0.75rem; color:var(--gray);">Tracking No.: ${ord.trackingNo || 'KRY-98765432-TH (Kerry Express)'}</p>
+            <p style="font-size:0.8rem; margin-bottom:0.3rem;"><strong>Delivered at:</strong> ${formatDateTime(ord.deliveredAt)}</p>
+            <p style="font-size:0.75rem; color:var(--gray);">Tracking No.: ${ord.trackingNo || '-'}</p>
           </div>
         </div>
       `;
@@ -401,55 +305,110 @@ function openOrderDetail(ordId) {
   openModal('modalOrderDetail');
 }
 
-// ── Action Handlers ────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────
+function formatDateTime(isoString) {
+  if (!isoString) return '-';
+  try {
+    return new Date(isoString).toLocaleString('th-TH', {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  } catch { return isoString; }
+}
 
-function approveSlip(ordId) {
+// ── Action Handlers ───────────────────────────────────────────
+
+async function approveSlip(ordId) {
   const ord = ordersList.find(o => o.orderId === ordId);
   if (!ord) return;
 
+  try {
+    if (window.GlowtimeAdminAPI) {
+      await window.GlowtimeAdminAPI.Orders.updateStatus(ord.id, 'confirmed');
+    }
+  } catch (e) {
+    console.warn('[orders.js] approveSlip backend error:', e.message);
+  }
+
   ord.status = 'confirmed';
-  ord.approvedAt = new Date().toLocaleString('th-TH');
-  renderOrderTable(ordersList);
-  openOrderDetail(ordId); // Refresh modal view cleanly
-  showToast(`Payment slip for order #${ordId} has been approved.`);
+  ord.approvedAt = new Date().toISOString();
+  updateCounters();
+  applyFilter(currentFilterStatus);
+  openOrderDetail(ordId);
+  showToast(`✓ Payment slip for order #${ordId} approved.`);
 }
 
 function rejectSlip(ordId) {
   showToast(`Order #${ordId}: Payment slip rejected. Customer has been notified.`);
 }
 
-function promptShipOrder(ordId) {
+async function promptShipOrder(ordId) {
   const ord = ordersList.find(o => o.orderId === ordId);
   if (!ord) return;
 
-  const tracking = prompt("กรุณาระบุเลขพัสดุ (Tracking Number):", `KRY-${Math.floor(10000000 + Math.random()*90000000)}-TH`);
-  if (tracking) {
-    ord.status = 'shipping';
-    ord.trackingNo = tracking + ' (Kerry Express)';
-    renderOrderTable(ordersList);
-    openOrderDetail(ordId);
-    showToast(`Order #${ordId} shipped. Tracking: ${tracking}`);
+  const tracking = prompt('กรุณาระบุเลขพัสดุ (Tracking Number):', `KRY-${Math.floor(10000000 + Math.random() * 90000000)}-TH`);
+  if (!tracking) return;
+
+  const carriers = ['Kerry Express', 'Flash Express', 'Thailand Post'];
+  const carrier = carriers[0];
+
+  try {
+    if (window.GlowtimeAdminAPI) {
+      await window.GlowtimeAdminAPI.Orders.updateStatus(ord.id, 'shipping');
+      await window.GlowtimeAdminAPI.Orders.addShipment(ord.id, tracking, carrier);
+    }
+  } catch (e) {
+    console.warn('[orders.js] promptShipOrder backend error:', e.message);
   }
+
+  ord.status = 'shipping';
+  ord.trackingNo = `${tracking} (${carrier})`;
+  updateCounters();
+  applyFilter(currentFilterStatus);
+  openOrderDetail(ordId);
+  showToast(`📦 Order #${ordId} shipped. Tracking: ${tracking}`);
 }
 
-function markDelivered(ordId) {
+async function markDelivered(ordId) {
   const ord = ordersList.find(o => o.orderId === ordId);
   if (!ord) return;
+
+  try {
+    if (window.GlowtimeAdminAPI) {
+      await window.GlowtimeAdminAPI.Orders.updateStatus(ord.id, 'delivered');
+    }
+  } catch (e) {
+    console.warn('[orders.js] markDelivered backend error:', e.message);
+  }
 
   ord.status = 'delivered';
-  ord.deliveredAt = new Date().toLocaleString('th-TH');
+  ord.deliveredAt = new Date().toISOString();
   ord.signedBy = ord.shippingAddress?.recipient || 'ลูกค้าผู้รับ';
-  renderOrderTable(ordersList);
+  updateCounters();
+  applyFilter(currentFilterStatus);
   openOrderDetail(ordId);
-  showToast(`Order #${ordId} marked as Delivered.`);
+  showToast(`✓ Order #${ordId} marked as Delivered.`);
 }
 
-function updateOrderStatus(newStatus) {
+// ── Direct Status Update (Quick Buttons in Modal) ─────────────
+async function updateOrderStatus(newStatus) {
   const ord = ordersList.find(o => o.orderId === activeSelectedOrderId);
-  if (ord) {
-    ord.status = newStatus;
-    renderOrderTable(ordersList);
-    openOrderDetail(activeSelectedOrderId);
-    showToast(`อัปเดตคำสั่งซื้อ ${ord.orderId} เป็นสถานะ "${newStatus}" แล้ว`);
+  if (!ord) return;
+
+  try {
+    if (window.GlowtimeAdminAPI) {
+      await window.GlowtimeAdminAPI.Orders.updateStatus(ord.id, newStatus);
+    }
+  } catch (e) {
+    console.warn('[orders.js] updateOrderStatus backend error:', e.message);
   }
+
+  ord.status = newStatus;
+  if (newStatus === 'confirmed' && !ord.approvedAt) ord.approvedAt = new Date().toISOString();
+  if (newStatus === 'delivered' && !ord.deliveredAt) ord.deliveredAt = new Date().toISOString();
+
+  updateCounters();
+  applyFilter(currentFilterStatus);
+  openOrderDetail(activeSelectedOrderId);
+  showToast(`อัปเดตคำสั่งซื้อ ${ord.orderId} → "${newStatus}" แล้ว`);
 }

@@ -20,9 +20,13 @@ let productsList = [
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.GlowtimeAdminAPI) {
-    const apiProducts = await window.GlowtimeAdminAPI.Products.list();
-    if (apiProducts && apiProducts.length > 0) {
-      productsList = apiProducts;
+    try {
+      const apiProducts = await window.GlowtimeAdminAPI.Products.list();
+      if (apiProducts && apiProducts.length > 0) {
+        productsList = apiProducts;
+      }
+    } catch (e) {
+      console.warn('[products.js] ใช้ mock data เนื่องจาก backend ไม่ตอบสนอง:', e.message);
     }
   }
   renderProductTable(productsList);
@@ -107,7 +111,7 @@ function filterProducts(cat) {
   else renderProductTable(productsList.filter(p => p.category === cat));
 }
 
-function saveNewProduct(e) {
+async function saveNewProduct(e) {
   e.preventDefault();
 
   const fileInput = document.getElementById('newProdImageFile');
@@ -126,7 +130,6 @@ function saveNewProduct(e) {
   const isEdit = !!editId;
 
   const prodData = {
-    id: isEdit ? Number(editId) : Math.max(...productsList.map(p => p.id)) + 1,
     name: document.getElementById('newProdName').value.trim(),
     brand: document.getElementById('newProdBrand').value.trim() || 'GLOWTIME',
     category: document.getElementById('newProdCat').value,
@@ -135,25 +138,55 @@ function saveNewProduct(e) {
     price: Number(document.getElementById('newProdPrice').value),
     stockQty: Number(document.getElementById('newProdStock').value),
     expiryDate: document.getElementById('newProdExpiry').value,
+    images: file ? [localImageUrl] : undefined,
   };
 
-  if (file || !isEdit) {
-    prodData.images = [localImageUrl];
-    prodData._localImage = localImageUrl;
-  }
-
   if (isEdit) {
-    const idx = productsList.findIndex(p => p.id === Number(editId));
-    if (idx !== -1) {
-      if (!file) {
-        // preserve old image if not uploading a new one
-        prodData.images = productsList[idx].images;
-        prodData._localImage = productsList[idx]._localImage;
+    // ── UPDATE (PUT) ──
+    try {
+      if (window.GlowtimeAdminAPI) {
+        const updated = await window.GlowtimeAdminAPI.Products.update(editId, prodData);
+        if (updated) {
+          const idx = productsList.findIndex(p => p.id === Number(editId));
+          if (idx !== -1) productsList[idx] = { ...productsList[idx], ...updated };
+        } else {
+          throw new Error('no api response');
+        }
+      } else {
+        throw new Error('no api');
       }
-      productsList[idx] = { ...productsList[idx], ...prodData };
+    } catch {
+      // fallback: update local only
+      const idx = productsList.findIndex(p => p.id === Number(editId));
+      if (idx !== -1) {
+        const merged = { ...productsList[idx], ...prodData, id: Number(editId) };
+        if (file) { merged.images = [localImageUrl]; merged._localImage = localImageUrl; }
+        productsList[idx] = merged;
+      }
     }
   } else {
-    productsList.unshift(prodData);
+    // ── CREATE (POST) ──
+    try {
+      if (window.GlowtimeAdminAPI) {
+        const created = await window.GlowtimeAdminAPI.Products.create(prodData);
+        if (created) {
+          productsList.unshift(created);
+        } else {
+          throw new Error('no api response');
+        }
+      } else {
+        throw new Error('no api');
+      }
+    } catch {
+      // fallback: add local only
+      const localItem = {
+        ...prodData,
+        id: Math.max(...productsList.map(p => p.id), 1000) + 1,
+        images: [localImageUrl],
+        _localImage: localImageUrl,
+      };
+      productsList.unshift(localItem);
+    }
   }
 
   renderProductTable(productsList);
@@ -200,8 +233,15 @@ function openAddProductModal() {
   openModal('modalAddProduct');
 }
 
-function deleteProductRow(id) {
+async function deleteProductRow(id) {
   if (confirm(`Are you sure you want to delete product #${id} from the catalog?`)) {
+    try {
+      if (window.GlowtimeAdminAPI) {
+        await window.GlowtimeAdminAPI.Products.delete(id);
+      }
+    } catch (e) {
+      console.warn('[products.js] deleteProductRow backend error:', e.message);
+    }
     productsList = productsList.filter(p => p.id !== id);
     renderProductTable(productsList);
     showToast(`Deleted product #${id} successfully`);

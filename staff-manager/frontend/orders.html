@@ -113,15 +113,15 @@
     <div class="content-card">
       <div class="card-header">
         <h3 class="card-title">Orders & Payments</h3>
-        <span class="status-badge badge-info">3 Active Orders</span>
+        <span class="status-badge badge-info" id="activeOrdersBadge">Loading...</span>
       </div>
 
       <div class="filter-row">
-        <button class="btn-dark-sm" onclick="filterOrders('all')">All Orders (3)</button>
-        <button class="btn-ghost-sm" onclick="filterOrders('pending_payment')">⏳ Pending Payment</button>
-        <button class="btn-ghost-sm" onclick="filterOrders('confirmed')">Confirmed / Paid</button>
-        <button class="btn-ghost-sm" onclick="filterOrders('shipping')">Shipping / In Transit</button>
-        <button class="btn-ghost-sm" onclick="filterOrders('delivered')">Delivered</button>
+        <button id="btnFilterAll"     class="btn-dark-sm"  onclick="filterOrders('all')">All Orders</button>
+        <button id="btnFilterPending" class="btn-ghost-sm" onclick="filterOrders('pending_payment')">⏳ Pending Payment</button>
+        <button id="btnFilterConfirmed" class="btn-ghost-sm" onclick="filterOrders('confirmed')">Confirmed / Paid</button>
+        <button id="btnFilterShipping" class="btn-ghost-sm" onclick="filterOrders('shipping')">Shipping / In Transit</button>
+        <button id="btnFilterDelivered" class="btn-ghost-sm" onclick="filterOrders('delivered')">Delivered</button>
       </div>
 
       <div class="table-responsive">
@@ -164,12 +164,12 @@
     </div>
 
     <div style="margin-bottom:1.5rem;">
-      <h4 style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); margin-bottom:0.6rem;">อัปเดตสถานะคำสั่งซื้อ (PUT /api/orders/:id/status)</h4>
+      <h4 style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); margin-bottom:0.6rem;">Quick Status Update <span style="font-weight:400; color:var(--gray);">(PUT /api/staff/orders/:id/status)</span></h4>
       <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-        <button class="btn-ghost-sm" onclick="updateOrderStatus('pending_payment')">⏳ pending_payment (รอชำระ)</button>
-        <button class="btn-dark-sm" onclick="updateOrderStatus('confirmed')">confirmed (ยืนยันรับเงิน/เตรียมจัดส่ง)</button>
-        <button class="btn-ghost-sm" onclick="updateOrderStatus('shipping')">shipping (กำลังจัดส่ง)</button>
-        <button class="btn-ghost-sm" onclick="updateOrderStatus('delivered')">delivered (ส่งสำเร็จ)</button>
+        <button class="btn-ghost-sm" onclick="updateOrderStatus('pending_payment')">⏳ pending_payment</button>
+        <button class="btn-ghost-sm" onclick="updateOrderStatus('confirmed')">✓ confirmed</button>
+        <button class="btn-ghost-sm" onclick="updateOrderStatus('shipping')">🚚 shipping</button>
+        <button class="btn-ghost-sm" onclick="updateOrderStatus('delivered')">📦 delivered</button>
       </div>
     </div>
   </div>

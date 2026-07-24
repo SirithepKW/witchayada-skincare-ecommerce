@@ -365,7 +365,6 @@ function closeDetailModal() {
   if (modal) modal.classList.remove('open');
 }
 
-
 // ── DOM Load Trigger ───────────────────────────────────────────────
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
@@ -422,11 +421,4 @@ async function loadDashboardFromAPI() {
   } catch (e) {
     console.warn('[dashboard.js] ไม่สามารถโหลดข้อมูล reports จาก backend:', e.message);
   }
-
-// ── DOM Load Trigger ──────────────────────────────────────────
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initDashboardCharts);
-} else {
-  initDashboardCharts();
-
 }

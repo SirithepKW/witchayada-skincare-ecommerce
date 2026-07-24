@@ -9,7 +9,17 @@ let usersList = [
   { id: 3, username: "warakorn_mgr", email: "warakorn@glowtime.com", role: "manager", profile: { skinType: "normal", phone: "086-777-6666" }, createdAt: "2026-05-01T08:00:00+07:00" }
 ];
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  if (window.GlowtimeAdminAPI) {
+    try {
+      const apiUsers = await window.GlowtimeAdminAPI.Users.list();
+      if (apiUsers && apiUsers.length > 0) {
+        usersList = apiUsers;
+      }
+    } catch (e) {
+      console.warn('[users.js] ใช้ mock data เนื่องจาก backend ไม่ตอบสนอง:', e.message);
+    }
+  }
   renderUserTable(usersList);
 });
 
