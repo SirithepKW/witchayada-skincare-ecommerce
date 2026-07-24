@@ -3,6 +3,23 @@ const { pool } = require('../../config/store');
 const PAYMENT_METHODS = ['credit_card', 'qr_code', 'bank_transfer', 'cash_on_delivery'];
 
 /**
+ * แปลง orderId ที่อาจเป็น display string "ORD-20250101-0001" หรือ numeric string
+ * คืนค่า integer หรือ throw 400 ถ้า parse ไม่ได้
+ */
+const parseOrderId = (orderId) => {
+  if (!orderId) {
+    const err = new Error('กรุณาระบุ orderId'); err.statusCode = 400; throw err;
+  }
+  const str = String(orderId).trim();
+  // รูปแบบ "ORD-YYYYMMDD-XXXX" → เอา segment สุดท้ายแล้ว parseInt
+  const numericId = str.includes('-') ? parseInt(str.split('-').pop(), 10) : parseInt(str, 10);
+  if (isNaN(numericId) || numericId <= 0) {
+    const err = new Error(`orderId ไม่ถูกต้อง: ${orderId}`); err.statusCode = 400; throw err;
+  }
+  return numericId;
+};
+
+/**
  * จำลองการชำระเงิน (Simulation)
  * — ตรวจสอบ order → สร้าง payment → อัปเดต status order เป็น confirmed
  */
@@ -14,7 +31,7 @@ const checkout = async (customerId, { orderId, method }) => {
   }
 
   // orderId จาก frontend อาจเป็น "ORD-20250101-0001" หรือ numeric
-  const numericId = Number(orderId);
+  const numericId = parseOrderId(orderId);
 
   const [[order]] = await pool.query(
     `SELECT order_id, customer_id, status, total_amount

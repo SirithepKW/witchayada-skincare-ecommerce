@@ -3,6 +3,23 @@ const { pool } = require('../../config/store');
 const ORDER_STATUSES = ['pending_payment', 'confirmed', 'shipping', 'delivered'];
 
 /**
+ * แปลง orderId ที่อาจเป็น display string "ORD-20250101-0001" หรือ numeric string
+ * คืนค่า integer หรือ throw 400 ถ้า parse ไม่ได้
+ */
+const parseOrderId = (orderId) => {
+  if (!orderId) {
+    const err = new Error('กรุณาระบุ orderId'); err.statusCode = 400; throw err;
+  }
+  const str = String(orderId).trim();
+  // รูปแบบ "ORD-YYYYMMDD-XXXX" → เอา segment สุดท้ายแล้ว parseInt
+  const numericId = str.includes('-') ? parseInt(str.split('-').pop(), 10) : parseInt(str, 10);
+  if (isNaN(numericId) || numericId <= 0) {
+    const err = new Error(`orderId ไม่ถูกต้อง: ${orderId}`); err.statusCode = 400; throw err;
+  }
+  return numericId;
+};
+
+/**
  * ดึง order พร้อม items (response shape เหมือนเดิม)
  */
 const buildOrderResponse = async (conn, orderId) => {
@@ -97,11 +114,16 @@ const createOrder = async (customerId, { shippingAddress, paymentMethod }) => {
     );
     const orderId = orderResult.insertId;
 
-    // Insert order items
+    // Insert order items และหัก stock_qty
     for (const item of cartItems) {
       await conn.query(
         'INSERT INTO order_items (order_id, product_id, qty, unit_price) VALUES (?, ?, ?, ?)',
         [orderId, item.product_id, item.qty, item.unit_price]
+      );
+      // Bug #5 fix: หัก stock_qty ทันทีที่ order สำเร็จ
+      await conn.query(
+        'UPDATE products SET stock_qty = stock_qty - ? WHERE product_id = ?',
+        [item.qty, item.product_id]
       );
     }
 
@@ -153,7 +175,7 @@ const getMyOrders = async (customerId) => {
  */
 const getOrderById = async (customerId, orderId) => {
   // orderId อาจเป็น display string "ORD-20250101-0001" หรือ numeric
-  const numericId = Number(orderId);
+  const numericId = parseOrderId(orderId);
   const [[order]] = await pool.query(
     'SELECT order_id FROM orders WHERE order_id = ? AND customer_id = ?',
     [numericId, customerId]
@@ -175,7 +197,7 @@ const getOrderById = async (customerId, orderId) => {
  */
 const confirmReceive = async (customerId, orderId) => {
   // orderId อาจเป็น display string "ORD-20250101-0001" หรือ numeric
-  const numericId = Number(orderId);
+  const numericId = parseOrderId(orderId);
 
   const [[order]] = await pool.query(
     'SELECT order_id, status FROM orders WHERE order_id = ? AND customer_id = ?',

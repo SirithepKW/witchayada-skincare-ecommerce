@@ -16,11 +16,13 @@ const getCart = async (req, res, next) => {
  */
 const addItem = async (req, res, next) => {
   try {
-    const { productId, qty } = req.body;
-    if (!productId || !qty) {
-      return res.status(400).json({ success: false, message: 'กรุณาระบุ productId และ qty' });
+    const { productId } = req.body;
+    const qty = Number(req.body.qty);
+    // Bug #4 fix: ตรวจสอบหลัง Number() เพื่อกัน edge case qty="0" หรือ qty=NaN
+    if (!productId || isNaN(qty) || qty < 1) {
+      return res.status(400).json({ success: false, message: 'กรุณาระบุ productId และ qty ที่ถูกต้อง (>= 1)' });
     }
-    const cart = await cartService.addItem(req.user.customerId, { productId, qty: Number(qty) });
+    const cart = await cartService.addItem(req.user.customerId, { productId, qty });
     res.status(201).json({ success: true, data: cart });
   } catch (err) { next(err); }
 };
@@ -31,11 +33,12 @@ const addItem = async (req, res, next) => {
  */
 const updateItem = async (req, res, next) => {
   try {
-    const { qty } = req.body;
-    if (!qty) {
-      return res.status(400).json({ success: false, message: 'กรุณาระบุ qty' });
+    const qty = Number(req.body.qty);
+    // Bug #4 fix: ตรวจสอบหลัง Number() เพื่อกัน edge case qty="0" หรือ qty=NaN
+    if (isNaN(qty) || qty < 1) {
+      return res.status(400).json({ success: false, message: 'กรุณาระบุ qty ที่ถูกต้อง (>= 1)' });
     }
-    const cart = await cartService.updateItem(req.user.customerId, req.params.cartItemId, { qty: Number(qty) });
+    const cart = await cartService.updateItem(req.user.customerId, req.params.cartItemId, { qty });
     res.json({ success: true, data: cart });
   } catch (err) { next(err); }
 };

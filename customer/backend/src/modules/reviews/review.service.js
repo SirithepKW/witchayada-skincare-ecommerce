@@ -35,11 +35,18 @@ const createReview = async (customerId, { productId, orderId, rating, comment })
     err.statusCode = 400; throw err;
   }
 
+  // แปลง orderId เป็น numeric (รองรับ "ORD-YYYYMMDD-XXXX")
+  const numericOrderId = orderId
+    ? (String(orderId).includes('-')
+        ? parseInt(String(orderId).split('-').pop(), 10)
+        : parseInt(String(orderId), 10))
+    : null;
+
   // ตรวจสอบว่าเคยรีวิวสินค้านี้ในออเดอร์นี้แล้วหรือยัง
-  if (orderId) {
+  if (numericOrderId) {
     const [[duplicate]] = await pool.query(
       'SELECT review_id FROM reviews WHERE product_id = ? AND customer_id = ? AND order_id = ?',
-      [Number(productId), customerId, Number(orderId)]
+      [Number(productId), customerId, numericOrderId]
     );
     if (duplicate) {
       const err = new Error('คุณได้รีวิวสินค้านี้ในออเดอร์นี้แล้ว');
@@ -49,15 +56,14 @@ const createReview = async (customerId, { productId, orderId, rating, comment })
 
   const [result] = await pool.query(
     'INSERT INTO reviews (product_id, customer_id, order_id, rating, comment) VALUES (?, ?, ?, ?, ?)',
-    [Number(productId), customerId, orderId ? Number(orderId) : null, Number(rating), comment.trim()]
+    [Number(productId), customerId, numericOrderId, Number(rating), comment.trim()]
   );
 
   return {
     id: result.insertId,
     productId: Number(productId),
     customerId,
-    // ถ้า frontend ไม่ส่ง orderId มา ให้ผูกกับออเดอร์แรกที่ซื้อสินค้านี้อัตโนมัติ
-    orderId: orderId || purchasedOrders[0].orderId,
+    orderId: numericOrderId,   // Bug #2 fix: ใช้ค่า numericOrderId แทน purchasedOrders[0].orderId
     rating: Number(rating),
     comment: comment.trim(),
   };

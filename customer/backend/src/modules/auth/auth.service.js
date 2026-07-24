@@ -82,6 +82,13 @@ const login = async ({ email, password }) => {
     throw err;
   }
 
+  // Bug #3 fix: ตรวจสอบว่ามี customer profile จริง ๆ ก่อน login สำเร็จ
+  if (!user.customer_id) {
+    const err = new Error('ไม่พบข้อมูลลูกค้า กรุณาติดต่อผู้ดูแลระบบ');
+    err.statusCode = 500;
+    throw err;
+  }
+
   // รองรับ password ธรรมดา (seed data ยังไม่ hash) — ถ้า bcrypt ไม่ match แต่ตรงกันเป๊ะ
   const token = generateToken(user);
   return { token, user: sanitizeUser(user) };
